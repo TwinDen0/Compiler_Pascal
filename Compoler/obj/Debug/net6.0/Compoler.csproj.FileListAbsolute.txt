@@ -1,0 +1,15 @@
+C:\Users\20kde\OneDrive\Рабочий стол\Compiler2\Compoler\bin\Debug\net6.0\Compoler.exe
+C:\Users\20kde\OneDrive\Рабочий стол\Compiler2\Compoler\bin\Debug\net6.0\Compoler.deps.json
+C:\Users\20kde\OneDrive\Рабочий стол\Compiler2\Compoler\bin\Debug\net6.0\Compoler.runtimeconfig.json
+C:\Users\20kde\OneDrive\Рабочий стол\Compiler2\Compoler\bin\Debug\net6.0\Compoler.dll
+C:\Users\20kde\OneDrive\Рабочий стол\Compiler2\Compoler\bin\Debug\net6.0\Compoler.pdb
+C:\Users\20kde\OneDrive\Рабочий стол\Compiler2\Compoler\obj\Debug\net6.0\Compoler.csproj.AssemblyReference.cache
+C:\Users\20kde\OneDrive\Рабочий стол\Compiler2\Compoler\obj\Debug\net6.0\Compoler.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\20kde\OneDrive\Рабочий стол\Compiler2\Compoler\obj\Debug\net6.0\Compoler.AssemblyInfoInputs.cache
+C:\Users\20kde\OneDrive\Рабочий стол\Compiler2\Compoler\obj\Debug\net6.0\Compoler.AssemblyInfo.cs
+C:\Users\20kde\OneDrive\Рабочий стол\Compiler2\Compoler\obj\Debug\net6.0\Compoler.csproj.CoreCompileInputs.cache
+C:\Users\20kde\OneDrive\Рабочий стол\Compiler2\Compoler\obj\Debug\net6.0\Compoler.dll
+C:\Users\20kde\OneDrive\Рабочий стол\Compiler2\Compoler\obj\Debug\net6.0\refint\Compoler.dll
+C:\Users\20kde\OneDrive\Рабочий стол\Compiler2\Compoler\obj\Debug\net6.0\Compoler.pdb
+C:\Users\20kde\OneDrive\Рабочий стол\Compiler2\Compoler\obj\Debug\net6.0\Compoler.genruntimeconfig.cache
+C:\Users\20kde\OneDrive\Рабочий стол\Compiler2\Compoler\obj\Debug\net6.0\ref\Compoler.dll
