@@ -1,0 +1,3 @@
+(1, 1) Fatal: Syntax error, ";" expected 
+1 5 String d ''#100''
+(1, 14) Fatal: Syntax error, ";" expected 

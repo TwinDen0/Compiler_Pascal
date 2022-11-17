@@ -1,0 +1,2 @@
+(1,4) Fatal: Syntax error, don't have factor
+

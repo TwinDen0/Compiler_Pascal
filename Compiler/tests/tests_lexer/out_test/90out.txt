@@ -1,0 +1,6 @@
+(1, 1) Error: Invalid integer expression 
+1 3 Identifier ff ff
+1 5 Separator . .
+1 6 Identifier e e
+1 7 Operation + +
+1 8 Integers 8 8

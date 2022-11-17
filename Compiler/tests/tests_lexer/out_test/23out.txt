@@ -1,0 +1,2 @@
+1 1 String ￿ #65535
+(2, 1) Fatal: Overflow symbol in string 

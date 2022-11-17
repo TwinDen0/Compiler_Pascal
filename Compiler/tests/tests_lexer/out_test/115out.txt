@@ -1,0 +1,4 @@
+1 1 Integers 1 1
+1 8 Integers 3 3
+(1, 10) Fatal: Syntax error, ";" expected 
+1 12 Integers 4 4

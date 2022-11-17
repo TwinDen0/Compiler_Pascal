@@ -48,14 +48,15 @@ namespace Compiler
 
     public class Lexer
     {
+        public static List<LexemeData> lexems = new List<LexemeData>();
+
         public State CurrentState
         {
             get;
             private set;
         }
         char[] operations = { '=', ':', '+', '-', '*', '/', '<', '>' };
-        string[] pair_operations = {
-      "<<", ">>", "**", "<>", "><", "<=", ">=", ":=", "+=", "-=", "*=", "/="};
+        string[] pair_operations = { "<<", ">>", "**", "<>", "><", "<=", ">=", ":=", "+=", "-=", "*=", "/="};
         char[] separators = { ',', ';', '(', ')', '[', ']', '.' };
         char[] exceptsign = { '\'', '#', '%', '&', '$', '{', '}', '\\' };
         string[] wordsKey = {
@@ -90,14 +91,15 @@ namespace Compiler
       "record",   "of",        "operator",
   };
 
-        int lineNum;
-        int symbolNum;
+        public int lineNum = 1;
+        public int symbolNum = 0;
         string lexeme = "";
         string lexemeValue = "";
         public bool pairSymbol = false;
         public char firstPairSymbol = ' ';
         string error = "";
         bool flagEndFile = false;
+        int i;
 
         struct StateTransition
         {
@@ -182,15 +184,15 @@ namespace Compiler
     };
         }
 
-        public void LexerReadFile(string path, string path_ans, string path_out)
+        public void LexerReadFile(string path)
         {
-            LexemeData newLexeme;
+            lineNum = 1;
+            symbolNum = 0;
+            lexems = new List<LexemeData>();
+                LexemeData newLexeme;
 
             using (FileStream fstream = File.OpenRead(path))
             {
-                lineNum = 1;
-                symbolNum = 0;
-
                 byte[] textFromFile = new byte[fstream.Length];
                 fstream.Read(textFromFile);
 
@@ -236,7 +238,7 @@ namespace Compiler
 
             byte a;
 
-            for (int i = 0; i < text.Count; i++)
+            for (i = 0; i < text.Count; i++)
             {
                 a = text[i];
 
@@ -315,15 +317,27 @@ namespace Compiler
                         }
 
                         if (CurrentState == State.Char) CurrentState = State.String;
+                        if (CurrentState == State.Integers && !Char.IsDigit(lexeme[^1]))
+                        {
+                            CurrentState = State.Real;
+                            lexeme += '0';
+                        }
+                            
 
                         SearchValue(lexeme);
 
                         if (CurrentState == State.Error)
                         {
-                            Console.WriteLine(
-                                $"({lineNum}, {(symbolNum - lexeme.Length + 1)}) {error} ");
-                            foundLexeme.value_lexeme = "error";
+                            foundLexeme = new LexemeData()
+                            {
+                                numb_line = lineNum,
+                                numb_symbol = (symbolNum - lexeme.Length + 1),
+                                class_lexeme = State.Error,
+                                value_lexeme = error,
+                                inital_value = lexeme
+                            };
                             lexeme = "";
+                            lexems.Add(foundLexeme);
                             return foundLexeme;
                         }
 
@@ -336,8 +350,7 @@ namespace Compiler
                             inital_value = lexeme
                         };
 
-                        Console.WriteLine(
-                            $"{foundLexeme.numb_line} | {foundLexeme.numb_symbol} | {foundLexeme.class_lexeme} | {foundLexeme.value_lexeme} | {foundLexeme.inital_value}");
+                        lexems.Add(foundLexeme);
 
                         lexeme = "";
                         return foundLexeme;
@@ -366,9 +379,6 @@ namespace Compiler
             if (exceptsign.Any(sm => sm == aChar)) tokenType = TokenType.ExceptSign;
             if (aChar == ' ' && CurrentState != State.Comment) return State.EndToken;
 
-            aByte = aByte;
-            aChar = aChar;
-
             //комменты
             if (CurrentState == State.Comment) return State.Comment;
             if (lexeme == "/" && aChar == '/') return State.Comment;
@@ -381,18 +391,31 @@ namespace Compiler
             }
 
             //исключения цифры
-            if (aChar == '.' && CurrentState == State.Integers) return State.Real;
+            
+            if(lexeme != "")
+            {
+                if (tokenType == TokenType.Number && lexeme[^1] == '.' && CurrentState == State.Integers) return State.Real;
+                if (aChar == '.' && lexeme[^1] == '.' && CurrentState == State.Integers)
+                {
+                    i -= 1;
+                    symbolNum -= 1;
+                    lexeme = lexeme.Remove(lexeme.Length - 1, 1);
+                    return State.EndToken;
+                }
+                if (aChar == '.' && CurrentState == State.Integers) return State.Integers;
+            }
+
             if (aChar == 'e' && CurrentState == State.Integers)
             {
                 pairSymbol = true;
                 return State.Real;
             }
-            if (aChar == '+' && CurrentState == State.Integers && pairSymbol == true)
+            if (aChar == '+' && CurrentState == State.Real && pairSymbol == true)
             {
                 pairSymbol = false;
                 return State.Real;
             }
-            if (aChar == '-' && CurrentState == State.Integers && pairSymbol == true)
+            if (aChar == '-' && CurrentState == State.Real && pairSymbol == true)
             {
                 pairSymbol = false;
                 return State.Real;
@@ -480,6 +503,15 @@ namespace Compiler
                 if (pair_operations.Any(sm => sm == pair))
                 {
                     return State.Operation;
+                }
+            }
+
+            //парные разделители
+            if (lexeme != "")
+            {
+                if (aChar == '.' && lexeme[^1] == '.' && CurrentState == State.Separator)
+                {
+                    return State.Separator;
                 }
             }
 
@@ -597,6 +629,9 @@ namespace Compiler
                 lex = lex.Replace(".", ",");
                 lex = lex.ToUpper();
                 int mantis;
+
+                if (lex[^1] == 'E' || lex[^1] == '.')
+                    lex += '0';
 
                 switch (lex[0])
                 {
@@ -727,20 +762,18 @@ namespace Compiler
     {
         static void Main(string[] args)
         {
-            string path;
+            string path = $@"..\..\..\tests\tests_parser\in_test\500in.txt";
             string path_out = @"..\..\..\out.txt";
             string path_ans = @"..\..\..\tests\01ans.txt";
             Lexer l = new Lexer();
+            Parser p = new Parser();
 
-            for (int i = 1; i <= 117; i++)
-            {
-                Console.WriteLine($"НАЧАЛО ФАЙЛА {i}---------");
-                path = $@"..\..\..\tests\in_test\{i}in.txt";
-                l.LexerReadFile(path, path_ans, path_out);
-            }
+            //p.ParserReadFile(path);
 
-            // path = $@"..\..\..\tests\in_test\500in.txt";
-            // l.LexerReadFile(path, path_ans, path_out);
+            Tester.StartTest();
+
+            //path = $@"..\..\..\tests\in_test\47in.txt";
+            //l.LexerReadFile(path, path_ans, path_out);
         }
     }
 }

@@ -1,0 +1,7 @@
+1 1 Separator , ,
+1 3 Separator ; ;
+1 5 Separator ( (
+1 7 Separator ) )
+1 9 Separator [ [
+1 11 Separator ] ]
+1 13 Separator . .
