@@ -1,2 +1,0 @@
-1 1 Separator . .
-1 2 Integers 1 1

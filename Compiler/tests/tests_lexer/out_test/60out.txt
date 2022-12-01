@@ -1,3 +1,0 @@
-1 1 Real 1.0000000000E-002 1e-2
-1 5 Separator . .
-1 6 Integers 3 3

@@ -1,0 +1,6 @@
+1,	1,	IDENTIFIER,	a,	a
+1,	2,	OPERATOR,	:=,	:=
+1,	4,	IDENTIFIER,	c,	c
+1,	5,	OPERATOR,	+,	+
+1,	6,	INTEGER,	12,	12
+EndFile
