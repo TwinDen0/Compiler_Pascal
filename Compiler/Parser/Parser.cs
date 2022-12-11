@@ -19,7 +19,7 @@ namespace Compiler.Parser
     public class Node
     {
         public NodeType type;
-        public string value = "";
+        public object value;
         public List<Node?>? children;
     }
     public class Parser
@@ -36,96 +36,80 @@ namespace Compiler.Parser
             notClosedBracket = 0;
             resParser = new Node();
         }
-        /*
-        public void ParserReadFile(string path)
+        
+        public Node GetParser()
         {
             resParser = new Node();
-            using (FileStream fstream = File.OpenRead(path))
+
+            CurrectLexem = lexer.GetLexeme();
+
+            resParser = ExpSimple();
+
+            if (CurrectLexem.LexemeType == LexemeType.ERROR)
             {
-                byte[] textFromFile = new byte[fstream.Length];
-                fstream.Read(textFromFile);
-
-                List<byte> text = new List<byte>();
-                for (int i = 0; i < textFromFile.Length; i++)
+                resParser = new Node()
                 {
-                    text.Add(textFromFile[i]);
-                }
-
-                byte endFile = 3;
-                text.Add(endFile);
-
-                CurrectLexem = lexer.GetLexeme();
-                resParser = ExpSimple(ref text);
-
-                if (CurrectLexem.LexemeType != LexemeType.NONE)
-                {
-                    resParser = new Node()
-                    {
-                        type = NodeType.Error,
-                        value = $"({lexer.lineNum},{lexer.symbolNum - 1}) Fatal: Syntax error, \";\" expected but \"{CurrectLexem.inital_value}\" found"
-                    };
-                }
-
-                lexer.lineNum = 1;
-                lexer.symbolNum = 0;
-            }
-            return;
-        }*/
-        
-        /*public LexemeData GetParser()
-        { 
-        }
-
-            public Node ExpSimple(ref List<byte> text)
-        {
-            Node leftСhild = Term(ref text);
-
-            while ((CurrectLexem.value_lexeme == "+" || CurrectLexem.value_lexeme == "-") && CurrectLexem.class_lexeme == State.Operator)
-            {
-                var operation = CurrectLexem.value_lexeme;
-                if (text.Count > 0)
-                {
-                    CurrectLexem = lexer.GetLexeme(ref text);
-                }
-                Node rightСhild = Term(ref text);
-                leftСhild = new Node()
-                {
-                    type = NodeType.BinOperation,
-                    value = operation,
-                    children = new List<Node?> { leftСhild, rightСhild }
+                    type = NodeType.Error,
+                    value = $"({lexer.lineNum},{lexer.symbolNum - 1}) Fatal: Syntax error, \";\" expected but \"{CurrectLexem.LexemeValue}\" found"
                 };
-
-                if (rightСhild.type == NodeType.Error)
-                {
-                    return new Node()
-                    {
-                        type = NodeType.Error,
-                        value = rightСhild.value
-                    };
-                }
             }
 
-            return leftСhild;
+            lexer.lineNum = 1;
+            lexer.symbolNum = 0;
+            return resParser;
         }
 
-        public Node Term(ref List<byte> text)
+        public Node ExpSimple()
         {
-            Node leftСhild = Factor(ref text);
+        Node leftСhild = Term();
+
+        while ((CurrectLexem.LexemeValue.ToString() == "+" || CurrectLexem.LexemeValue.ToString() == "-") && CurrectLexem.LexemeType == LexemeType.OPERATOR)
+        {
+            var operation = CurrectLexem.LexemeValue;
+
+            if (CurrectLexem.LexemeType != LexemeType.ENDFILE)
+            {
+                CurrectLexem = lexer.GetLexeme();
+            }
+            Node rightСhild = Term();
+            leftСhild = new Node()
+            {
+                type = NodeType.BinOperation,
+                value = operation,
+                children = new List<Node?> { leftСhild, rightСhild }
+            };
+
+            if (rightСhild.type == NodeType.Error)
+            {
+                return new Node()
+                {
+                    type = NodeType.Error,
+                    value = rightСhild.value
+                };
+            }
+        }
+
+        return leftСhild;
+    }
+
+        public Node Term()
+        {
+            Node leftСhild = Factor();
 
             if (leftСhild.type != NodeType.Error)
             {
-                CurrectLexem = lexer.GetLexeme(ref text);
-                while ((CurrectLexem.value_lexeme == "*" || CurrectLexem.value_lexeme == "/") && CurrectLexem.class_lexeme == State.Operator)
+                CurrectLexem = lexer.GetLexeme();
+                while ((CurrectLexem.LexemeValue.ToString() == "*" || CurrectLexem.LexemeValue.ToString() == "/") && CurrectLexem.LexemeType == LexemeType.OPERATOR)
                 {
-                    var operation = CurrectLexem.value_lexeme;
-                    if (text.Count > 0)
+                    var operation = CurrectLexem.LexemeValue;
+                    if (CurrectLexem.LexemeType != LexemeType.ENDFILE)
                     {
-                        CurrectLexem = lexer.GetLexeme(ref text);
+                        CurrectLexem = lexer.GetLexeme();
                     }
-                    Node rightСhild = Factor(ref text);
-                    if (text.Count > 0)
+                    Node rightСhild = Factor();
+                    if (CurrectLexem.LexemeType != LexemeType.ENDFILE)
                     {
-                        CurrectLexem = lexer.GetLexeme(ref text);
+                        CurrectLexem = lexer.GetLexeme();
                     }
 
                     leftСhild = new Node()
@@ -148,36 +132,36 @@ namespace Compiler.Parser
             return leftСhild;
         }
 
-        public Node Factor(ref List<byte> text)
+        public Node Factor()
         {
 
-            if (CurrectLexem.class_lexeme == State.Integer || CurrectLexem.class_lexeme == State.Real)
+            if (CurrectLexem.LexemeType == LexemeType.INTEGER || CurrectLexem.LexemeType == LexemeType.REAL)
             {
                 LexemeData factor = CurrectLexem;
 
                 return new Node()
                 {
                     type = NodeType.Number,
-                    value = factor.value_lexeme
+                    value = factor.LexemeValue
                 };
             }
-            if (CurrectLexem.class_lexeme == State.Identifier)
+            if (CurrectLexem.LexemeType == LexemeType.IDENTIFIER)
             {
                 LexemeData factor = CurrectLexem;
 
                 return new Node()
                 {
                     type = NodeType.Identifier,
-                    value = factor.value_lexeme
+                    value = factor.LexemeValue
                 };
             }
-            if (CurrectLexem.value_lexeme == "(" && CurrectLexem.class_lexeme == State.Separator)
+            if (CurrectLexem.LexemeValue.ToString() == "(" && CurrectLexem.LexemeType == LexemeType.SEPARATOR)
             {
                 Node newExp = new Node();
-                if (text.Count > 1)
+                if (CurrectLexem.LexemeType != LexemeType.ENDFILE)
                 {
-                    CurrectLexem = lexer.GetLexeme(ref text);
-                    newExp = ExpSimple(ref text);
+                    CurrectLexem = lexer.GetLexeme();
+                    newExp = ExpSimple();
                 }
                 else
                 {
@@ -188,9 +172,9 @@ namespace Compiler.Parser
                     };
                 }
 
-                if (CurrectLexem.value_lexeme != ")" || CurrectLexem.class_lexeme != State.Separator)
+                if (CurrectLexem.LexemeValue.ToString() != ")" || CurrectLexem.LexemeType != LexemeType.SEPARATOR)
                 {
-                    if (text.Count != 1)
+                    if (CurrectLexem.LexemeType != LexemeType.ENDFILE)
                     {
                         notClosedBracket += 1;
                     }
@@ -211,6 +195,6 @@ namespace Compiler.Parser
                 type = NodeType.Error,
                 value = $"({lexer.lineNum},{lexer.symbolNum - 1}) Fatal: Syntax error, don't have factor"
             };
-        }*/
+        }
     }
 }

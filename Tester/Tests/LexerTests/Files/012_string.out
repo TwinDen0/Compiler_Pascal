@@ -1,1 +1,1 @@
-(1,3) Fatal: Syntax error, ";" expected
+(1,4) Fatal: Lexical error, "'" expected

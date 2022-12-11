@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "lJrbCkSLyw7ZMc34N1hRkM4Y4601LVsfDGxXZY02NHoz6eQWqlIdwIfkVGiFDcnf7EDbExEnTbpUYvVF6Nf4ww==",
+  "dgSpecHash": "BTgGBx7nHaBlWwCFlTF9joGgC651IuTtTR2/OSlh+OBmr2ORlZgfjhC6PyOiwCxYHixN+/W+zoymnD6vKMXIGw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\20kde\\OneDrive\\Рабочий стол\\Compiler_Pascal\\Compiler\\Compiler.csproj",
+  "projectFilePath": "C:\\Git\\Compiler_Pascal\\Compiler\\Compiler.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

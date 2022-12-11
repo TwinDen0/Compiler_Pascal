@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\20kde\\OneDrive\\Рабочий стол\\Compiler_Pascal\\Tester\\Tester.csproj": {}
+    "C:\\Git\\Compiler_Pascal\\Tester\\Tester.csproj": {}
   },
   "projects": {
-    "C:\\Users\\20kde\\OneDrive\\Рабочий стол\\Compiler_Pascal\\Compiler\\Compiler.csproj": {
+    "C:\\Git\\Compiler_Pascal\\Compiler\\Compiler.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\20kde\\OneDrive\\Рабочий стол\\Compiler_Pascal\\Compiler\\Compiler.csproj",
+        "projectUniqueName": "C:\\Git\\Compiler_Pascal\\Compiler\\Compiler.csproj",
         "projectName": "Compiler",
-        "projectPath": "C:\\Users\\20kde\\OneDrive\\Рабочий стол\\Compiler_Pascal\\Compiler\\Compiler.csproj",
+        "projectPath": "C:\\Git\\Compiler_Pascal\\Compiler\\Compiler.csproj",
         "packagesPath": "C:\\Users\\20kde\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\20kde\\OneDrive\\Рабочий стол\\Compiler_Pascal\\Compiler\\obj\\",
+        "outputPath": "C:\\Git\\Compiler_Pascal\\Compiler\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\20kde\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -59,14 +59,14 @@
         }
       }
     },
-    "C:\\Users\\20kde\\OneDrive\\Рабочий стол\\Compiler_Pascal\\Tester\\Tester.csproj": {
+    "C:\\Git\\Compiler_Pascal\\Tester\\Tester.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\20kde\\OneDrive\\Рабочий стол\\Compiler_Pascal\\Tester\\Tester.csproj",
+        "projectUniqueName": "C:\\Git\\Compiler_Pascal\\Tester\\Tester.csproj",
         "projectName": "Tester",
-        "projectPath": "C:\\Users\\20kde\\OneDrive\\Рабочий стол\\Compiler_Pascal\\Tester\\Tester.csproj",
+        "projectPath": "C:\\Git\\Compiler_Pascal\\Tester\\Tester.csproj",
         "packagesPath": "C:\\Users\\20kde\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\20kde\\OneDrive\\Рабочий стол\\Compiler_Pascal\\Tester\\obj\\",
+        "outputPath": "C:\\Git\\Compiler_Pascal\\Tester\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\20kde\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -83,8 +83,8 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "C:\\Users\\20kde\\OneDrive\\Рабочий стол\\Compiler_Pascal\\Compiler\\Compiler.csproj": {
-                "projectPath": "C:\\Users\\20kde\\OneDrive\\Рабочий стол\\Compiler_Pascal\\Compiler\\Compiler.csproj"
+              "C:\\Git\\Compiler_Pascal\\Compiler\\Compiler.csproj": {
+                "projectPath": "C:\\Git\\Compiler_Pascal\\Compiler\\Compiler.csproj"
               }
             }
           }

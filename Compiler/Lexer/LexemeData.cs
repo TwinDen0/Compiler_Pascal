@@ -23,7 +23,7 @@ namespace Compiler.Lexer
 
     public class LexemeData
     {
-        public LexemeData(int numbLine, int numbSymbol, LexemeType lexemeType, string lexemeSource, object lexemeValue)
+        public LexemeData(int numbLine, int numbSymbol, LexemeType lexemeType, object lexemeValue, string lexemeSource)
         {
             NumbLine = numbLine;
             NumbSymbol = numbSymbol;

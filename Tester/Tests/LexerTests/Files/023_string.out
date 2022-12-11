@@ -1,2 +1,2 @@
-1,	1,	STRING,	?,	#65535
+1	1	STRING	?	#65535
 (2,6) Fatal: Overflow symbol in string

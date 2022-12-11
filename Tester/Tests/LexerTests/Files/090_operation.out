@@ -1,2 +1,5 @@
-1,	1,	IDENTIFIER,	a,	a
-(1,2) Fatal: Syntax error, ";" expected
+1	1	IDENTIFIER	a	a
+1	3	OPERATOR	+	+
+1	4	OPERATOR	-	-
+1	6	IDENTIFIER	b	b
+EndFile

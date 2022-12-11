@@ -1,8 +1,8 @@
-1,	1,	OPERATOR,	+,	+
-1,	3,	OPERATOR,	-,	-
-1,	5,	OPERATOR,	/,	/
-1,	7,	OPERATOR,	*,	*
-1,	9,	OPERATOR,	:,	:
-1,	11,	OPERATOR,	<,	<
-1,	13,	OPERATOR,	>,	>
+1	1	OPERATOR	+	+
+1	3	OPERATOR	-	-
+1	5	OPERATOR	/	/
+1	7	OPERATOR	*	*
+1	9	OPERATOR	:	:
+1	11	OPERATOR	<	<
+1	13	OPERATOR	>	>
 EndFile

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "6Se/hiDt3k9e7vby1i7/2Jwm9sKN3LZvFRClJPbkRVRxpLdTluYWkgAB1dHoaPC/OOVAwEJHPJRQtht7ZW1zfg==",
+  "dgSpecHash": "J/5OdtAPJCTv5oNagOXcWuPTz+1qiixPoUO0D3VCiGQWU8agzC3MxXrgvuc0IVzVIWr9+xfdstEfkpaBla5K0Q==",
   "success": true,
-  "projectFilePath": "C:\\Users\\20kde\\OneDrive\\Рабочий стол\\Compiler_Pascal\\Tester\\Tester.csproj",
+  "projectFilePath": "C:\\Git\\Compiler_Pascal\\Tester\\Tester.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\20kde\\.nuget\\packages\\coverlet.collector\\3.1.2\\coverlet.collector.3.1.2.nupkg.sha512",
     "C:\\Users\\20kde\\.nuget\\packages\\microsoft.codecoverage\\17.1.0\\microsoft.codecoverage.17.1.0.nupkg.sha512",

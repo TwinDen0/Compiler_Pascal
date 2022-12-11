@@ -15,45 +15,72 @@ namespace Compiler
     public class Program
     {
         static void Main(string[] args)
-        {
-           if (args.Length == 0)
-                return;
-            
-           var lexer = new Lexer.Lexer(args[0]);
-          
-          // string filePath = "../../../../Tester/Tests/LexerTests/Files/048_real.in";
-          // var lexer = new Lexer.Lexer(filePath);
-          
-            var endfile = false;
+        {/*
+            string filePath = "../../../../Tester/Tests/LexerTests/Files/016_string.in";
+
+            var lexer = new Lexer.Lexer(filePath);
+
+            bool endfile = false;
             while (!endfile)
             {
                 LexemeData currectlexeme = lexer.GetLexeme();
 
-                if(currectlexeme.LexemeType == LexemeType.ENDFILE || currectlexeme.LexemeType == LexemeType.ERROR) endfile = true;
-            }
-
-            /*
-            try
-            {
-                var lexer = new Lexer.Lexer(filePath);
-                if (args.Contains("-lexer"))
+                if (currectlexeme.LexemeType == LexemeType.ENDFILE)
                 {
-                    var token =lexer.GetLexeme();
-                    while (token.TokenType != SymbolType.EndFile)
+                    Console.Write("EndFile");
+                    endfile = true;
+                    break;
+                }
+                if (currectlexeme.LexemeType == LexemeType.ERROR)
+                {
+                    Console.Write(currectlexeme.LexemeValue);
+                    endfile = true;
+                    break;
+                }
+
+                Console.WriteLine($"{currectlexeme.NumbLine}\t{currectlexeme.NumbSymbol}\t{currectlexeme.LexemeType}\t{currectlexeme.LexemeValue}\t{currectlexeme.LexemeSource}");
+            }/**/
+            
+            //var parser = new Parser.Parser(filePath);
+            //var treeATC = parser.GetParser();
+            //Parser.PrintAST.Print(treeATC);
+            
+            if (args.Length == 0)
+                return;
+
+            if (args.Contains("-lexer"))
+            {
+                var lexer = new Lexer.Lexer(args[0]);
+
+                bool endfile = false;
+                while (!endfile)
+                {
+                    LexemeData currectlexeme = lexer.GetLexeme();
+
+                    if (currectlexeme.LexemeType == LexemeType.ENDFILE)
                     {
-                        Console.WriteLine(token);
-                        token = tokenizer.Get();
+                        Console.Write("EndFile");
+                        endfile = true;
+                        break;
                     }
+                    if (currectlexeme.LexemeType == LexemeType.ERROR)
+                    {
+                        Console.Write(currectlexeme.LexemeValue);
+                        endfile = true;
+                        break;
+                    }
+
+                    Console.WriteLine($"{currectlexeme.NumbLine}\t{currectlexeme.NumbSymbol}\t{currectlexeme.LexemeType}\t{currectlexeme.LexemeValue}\t{currectlexeme.LexemeSource}");
                 }
             }
-            catch (FileNotFoundException e)
+            if (args.Contains("-parser"))
             {
-                Console.WriteLine($"error: file {e.FileName} not found");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }*/
+                var parser = new Parser.Parser(args[0]);
+
+                var treeATC = parser.GetParser();
+
+                Parser.PrintAST.Print(treeATC);
+            }/**/
         }
     }
 }
