@@ -16,7 +16,6 @@ namespace Compiler.Lexer
         REAL,
         SEPARATOR,
         OPERATOR,
-        NONE,
         ENDFILE,
         ERROR,
     }

@@ -20,7 +20,7 @@ namespace Compiler.Parser
     {
         public NodeType type;
         public object value;
-        public List<Node?>? children;
+        public List<Node> children;
     }
     public class Parser
     {
@@ -76,7 +76,7 @@ namespace Compiler.Parser
             {
                 type = NodeType.BinOperation,
                 value = operation,
-                children = new List<Node?> { leftСhild, rightСhild }
+                children = new List<Node> { leftСhild, rightСhild }
             };
 
             if (rightСhild.type == NodeType.Error)
@@ -116,7 +116,7 @@ namespace Compiler.Parser
                     {
                         type = NodeType.BinOperation,
                         value = operation,
-                        children = new List<Node?> { leftСhild, rightСhild }
+                        children = new List<Node> { leftСhild, rightСhild }
                     };
 
                     if (rightСhild.type == NodeType.Error)

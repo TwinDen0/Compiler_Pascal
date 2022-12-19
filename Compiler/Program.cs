@@ -15,8 +15,8 @@ namespace Compiler
     public class Program
     {
         static void Main(string[] args)
-        {/*
-            string filePath = "../../../../Tester/Tests/LexerTests/Files/016_string.in";
+        {   /*
+            string filePath = "../../../../Tester/Tests/LexerTests/Files/063_numsystem2.in";
 
             var lexer = new Lexer.Lexer(filePath);
 

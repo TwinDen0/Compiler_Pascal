@@ -16,9 +16,6 @@ namespace Compiler.Lexer
         WordsKeyNonReserv,
         Integer,
         Real,
-        NumSystem_2,
-        NumSystem_8,
-        NumSystem_16,
         Operator,
         Separator,
         EndToken,
@@ -38,13 +35,11 @@ namespace Compiler.Lexer
     {
         private LexemeData lastLexeme;
         private readonly StreamReader reader;
-        private string? lastLineFile;
+        private string lastLineFile;
         public int lineNum;
         public int symbolNum;
         public string foundLexeme;
         private object lexemeValue;
-        private bool pairSymbol;
-        private char firstPairSymbol;
         private string error;
         private int cursor;
         State nextStates;
@@ -63,7 +58,7 @@ namespace Compiler.Lexer
         char[] operations = { '=', ':', '+', '-', '*', '/', '<', '>', '{' };
         string[] pair_operations = { "<<", ">>", "**", "<>", "><", "<=", ">=", ":=", "+=", "-=", "*=", "/=" };
         char[] separators = { '.', ',', ';', '(', ')', '[', ']' };
-        char[] exceptsign = { '\'', '#', '%', '&', '$' };
+        char[] exceptsign = { '\'', '#', '%', '&', '$', '}' };
         string[] wordsKey = {
             "absolute",     "abstract",   "alias",         "assembler",
             "bitpacked",    "break",      "cdecl",         "continue",
@@ -97,10 +92,10 @@ namespace Compiler.Lexer
         };
         public Lexer(string filePath)
         {
-            currentState = State.Start;
-            lastLexeme = null;
-            reader = new StreamReader(filePath);
-            lastLineFile = reader.ReadLine();
+                currentState = State.Start;
+                lastLexeme = null;
+                reader = new StreamReader(filePath);
+                lastLineFile = reader.ReadLine();
             transitions = new Dictionary<StateTransition, State>{
                 {new StateTransition(State.Start, SymbolType.Letter), State.Identifier},
                 {new StateTransition(State.Start, SymbolType.Number), State.Integer},
@@ -119,8 +114,6 @@ namespace Compiler.Lexer
                 {new StateTransition(State.Real, SymbolType.Number), State.Real},
                 {new StateTransition(State.Real, SymbolType.OperationSign), State.EndToken},
                 {new StateTransition(State.Real, SymbolType.SeparatorSign), State.EndToken},
-
-                {new StateTransition(State.NumSystem_16, SymbolType.Number), State.NumSystem_16},
 
                 {new StateTransition(State.Operator, SymbolType.Letter), State.EndToken},
                 {new StateTransition(State.Operator, SymbolType.Number), State.EndToken},
@@ -146,12 +139,9 @@ namespace Compiler.Lexer
         }
         public LexemeData GetLexeme()
         {
-            if (lastLexeme != null)
-            {
-                if (lastLexeme.LexemeType == LexemeType.ERROR) return null;
-            }
+            if (lastLexeme?.LexemeType == LexemeType.ERROR) return null;
 
-            var lexemeReceived = false;
+            bool lexemeReceived = false;
             while (!lexemeReceived)
             {
                 for (int i = cursor; i < lastLineFile?.Length; i++)
@@ -159,6 +149,12 @@ namespace Compiler.Lexer
                     char symbol = lastLineFile[i];
 
                     nextStates = NextState(symbol);
+
+                    if (nextStates == State.Start)
+                    {
+                        cursor += 1;
+                        continue;
+                    }
 
                     if (nextStates == State.Comment)
                     {
@@ -172,44 +168,23 @@ namespace Compiler.Lexer
                         return lastLexeme;
                     }
 
-                    if(nextStates == State.Start)
-                    {
-                        cursor += 1;
-                        continue;
-                    }
-
                     if (nextStates != State.EndToken)
                     {
                         currentState = nextStates;
                         foundLexeme += symbol;
                         symbolNum += 1;
-                        if (i == lastLineFile.Length - 1)
-                        {
-                            i += 1;
-                            if (currentState == State.Comment)
-                            {
-                                nextStates = State.Comment;
-                            }
-                            else
-                            {
-                                nextStates = State.EndToken;
-                            }
-                        }
-                        else
-                        {
-                            continue;
-                        }
                     }
 
-                    if (nextStates == State.EndToken)
+                    if (nextStates == State.EndToken || i == lastLineFile.Length - 1)
                     {
-                        lexemeValue = SearchValueLexeme();
+                        lexemeValue = GetValueLexeme();
 
                         var LexemType = new LexemeType();
                         switch (currentState)
                         {
-                            case State.Comment:
-                                LexemType = LexemeType.NONE; break;
+                            case State.Error:
+                                lastLexeme = new LexemeData(lineNum, symbolNum, LexemeType.ERROR, error, null);
+                                return lastLexeme;
                             case State.Identifier:
                                 LexemType = LexemeType.IDENTIFIER; break;
                             case State.Char:
@@ -224,12 +199,6 @@ namespace Compiler.Lexer
                                 LexemType = LexemeType.INTEGER; break;
                             case State.Real:
                                 LexemType = LexemeType.REAL; break;
-                            case State.NumSystem_2:
-                                LexemType = LexemeType.INTEGER; break;
-                            case State.NumSystem_8:
-                                LexemType = LexemeType.INTEGER; break;
-                            case State.NumSystem_16:
-                                LexemType = LexemeType.INTEGER; break;
                             case State.Operator:
                                 LexemType = LexemeType.OPERATOR; break;
                             case State.Separator:
@@ -238,23 +207,15 @@ namespace Compiler.Lexer
                                 LexemType = LexemeType.ENDFILE; break;
                         }
 
-                        int newSymbolNum = (cursor + 1) + symbolNum - foundLexeme.Length;
+                        int newSymbolNum = cursor + 1;
                         cursor = cursor + symbolNum;
                         symbolNum = 0;
 
-
-                        if (currentState == State.Error)
-                        {
-                            lastLexeme = new LexemeData(lineNum, newSymbolNum, LexemeType.ERROR, error, foundLexeme);
-                            return lastLexeme;
-                        }
-
-                        currentState = State.Start;
                         lastLexeme = new LexemeData(lineNum, newSymbolNum, LexemType, lexemeValue, foundLexeme);
 
+                        currentState = State.Start;
                         foundLexeme = null;
                         lexemeReceived = true;
-
                         return lastLexeme;
                     }
 
@@ -262,34 +223,28 @@ namespace Compiler.Lexer
 
                 if (cursor >= lastLineFile?.Length)
                 {
-                    NewLine();
+                    GetNextLine();
                 }
 
                 if (lastLineFile == null)
                 {
                     lastLexeme = new LexemeData(0, 0, LexemeType.ENDFILE, "", null);
-
                     return lastLexeme;
                 }
             }
+
             return lastLexeme;
         }
         State NextState(char symbol)
         {
-            SymbolType byteType = new SymbolType();
+            SymbolType symbolType = new SymbolType();
             State nextState;
 
-            if (Char.IsDigit(symbol)) byteType = SymbolType.Number;
-            if (Char.IsLetter(symbol)) byteType = SymbolType.Letter;
-            if (operations.Any(sm => sm == symbol)) byteType = SymbolType.OperationSign;
-            if (separators.Any(sm => sm == symbol)) byteType = SymbolType.SeparatorSign;
-            if (exceptsign.Any(sm => sm == symbol)) byteType = SymbolType.ExceptSign;
-
-            if(symbol == '}')
-            {
-                error = $"({lineNum},{symbolNum + 1})Fatal: illegal character \"'}}'\"";
-                return State.Error;
-            }
+            if (Char.IsDigit(symbol)) symbolType = SymbolType.Number;
+            if (Char.IsLetter(symbol)) symbolType = SymbolType.Letter;
+            if (operations.Any(sm => sm == symbol)) symbolType = SymbolType.OperationSign;
+            if (separators.Any(sm => sm == symbol)) symbolType = SymbolType.SeparatorSign;
+            if (exceptsign.Any(sm => sm == symbol)) symbolType = SymbolType.ExceptSign;
 
             if (symbol == ' ')
             {
@@ -297,10 +252,15 @@ namespace Compiler.Lexer
                 {
                     return State.Start;
                 }
-                if (pairSymbol == false)
+                else
                 {
                     return State.EndToken;
                 }
+            }
+
+            if (symbol == '%' || symbol == '&' || symbol == '$')
+            {
+                return State.Integer;
             }
 
             if (foundLexeme == "/" && symbol == '/')
@@ -308,6 +268,7 @@ namespace Compiler.Lexer
                 SkipСomment("small");
                 return State.Comment;
             }
+
             if (symbol == '{' && foundLexeme == null)
             {
                 SkipСomment("big");
@@ -322,105 +283,10 @@ namespace Compiler.Lexer
                 }
             }
 
-            nextState = SearchExcpection(symbol, byteType);
-            if (nextState != State.Start)
-            {
-                return nextState;
-            }
-
-            StateTransition transition = new StateTransition(currentState, byteType);
-            if (!transitions.TryGetValue(transition, out nextState))
-            {
-                error = $"({lineNum},{symbolNum + 1}) Fatal: Syntax error, \";\" expected";
-                return State.Error;
-            }
-            return nextState;
-        }
-        State SearchExcpection(char symbol, SymbolType symbolType)
-        {
-            //исключения цифры
-            if (foundLexeme != null && currentState == State.Integer)
-            {
-                if (foundLexeme.Length > 0)
-                {
-                    if (foundLexeme[^1] == '.' && symbolType != SymbolType.Number && symbol != 'e')
-                    {
-                        foundLexeme = foundLexeme.Remove(foundLexeme.Length - 1, 1);
-                        cursor -= 1;
-                        return State.EndToken;
-                    }
-                    if (currentState == State.Integer && foundLexeme[^1] == '.' && symbol == '.')
-                    {
-                        foundLexeme = foundLexeme.Remove('.');
-                        cursor -= 1;
-                        return State.EndToken;
-                    }
-
-                    if (symbol == 'e' || (foundLexeme[^1] == '.' && symbolType == SymbolType.Number)) currentState = State.Real;
-
-                    if (symbol == '.') return State.Integer;
-                }
-            }
-
-            //исключение реал
-            if (currentState == State.Real)
-            {
-                FoundReal();
-                
-                if (error == null)
-                {
-                    return State.EndToken;
-                }
-                else
-                {
-                    return State.Error;
-                }
-            }
-
-            //лишнее поиск реала
-            /*
-            if (symbol == '%' && currentState == State.Start) return State.NumSystem_2;
-            if (symbol == '&' && currentState == State.Start) return State.NumSystem_8;
-            if (symbol == '$' && currentState == State.Start) return State.NumSystem_16;
-            if (currentState == State.NumSystem_2)
-            {
-                if (symbol == '0' || symbol == '1')
-                    return State.NumSystem_2;
-                else
-                {
-                    error = $"({lineNum},{symbolNum}) Fatal: Syntax error, \";\" expected";
-                    return State.Error;
-                }
-            }
-            if (currentState == State.NumSystem_8)
-            {
-                if (symbol >= '0' && symbol <= '7')
-                    return State.NumSystem_8;
-                else
-                {
-                    error = $"({lineNum},{symbolNum}) Fatal: Lexical error, \";\" expected";
-                    return State.Error;
-                }
-            }
-            if (currentState == State.NumSystem_16 && symbolType == SymbolType.Letter)
-            {
-                char aUp = char.ToUpper(symbol);
-                if (aUp >= 'A' && aUp <= 'F')
-                    return State.NumSystem_16;
-                else
-                {
-                    error = $"({lineNum},{symbolNum}) Fatal: Syntax error, \";\" expected";
-                    return State.Error;
-                }
-            }
-            */
-
-
-            ///строчка
             if ((symbol == '\'' || symbol == '#') && foundLexeme == null)
             {
                 FoundString();
-                currentState= State.String;
+                currentState = State.String;
                 if (error == null)
                 {
                     return State.EndToken;
@@ -431,7 +297,44 @@ namespace Compiler.Lexer
                 }
             }
 
-            //парные операнты
+            if (currentState == State.Integer)
+            {
+                if (foundLexeme?[0] == '$' && symbolType == SymbolType.Letter)
+                {
+                    return State.Integer;
+                }
+                if (foundLexeme?[^1] == '.' && symbolType != SymbolType.Number && symbol != 'e')
+                {
+                    foundLexeme = foundLexeme.Remove(foundLexeme.Length - 1, 1);
+                    symbolNum -= 1;
+                    return State.EndToken;
+                }
+                if (currentState == State.Integer && foundLexeme?[^1] == '.' && symbol == '.')
+                {
+                    foundLexeme = foundLexeme.Remove('.');
+                    symbolNum -= 1;
+                    return State.EndToken;
+                }
+
+                if (symbol == 'e' || (foundLexeme?[^1] == '.' && symbolType == SymbolType.Number)) currentState = State.Real;
+
+                if (symbol == '.') return State.Integer;
+            }
+
+            if (currentState == State.Real)
+            {
+                FoundReal();
+
+                if (error == null)
+                {
+                    return State.EndToken;
+                }
+                else
+                {
+                    return State.Error;
+                }
+            }
+
             if (currentState == State.Operator && symbolType == SymbolType.OperationSign)
             {
                 string pair = "";
@@ -449,10 +352,9 @@ namespace Compiler.Lexer
                 }
             }
 
-            //парные разделители
             if (currentState == State.Separator)
             {
-                if(symbolType == SymbolType.SeparatorSign)
+                if (symbolType == SymbolType.SeparatorSign)
                 {
                     string pair = "";
                     pair = foundLexeme + symbol.ToString();
@@ -469,8 +371,15 @@ namespace Compiler.Lexer
             }
 
 
-            return State.Start;
+            StateTransition transition = new StateTransition(currentState, symbolType);
+            if (!transitions.TryGetValue(transition, out nextState))
+            {
+                error = $"({lineNum},{symbolNum + 1}) Fatal: Syntax error, \";\" expected";
+                return State.Error;
+            }
+            return nextState;
         }
+
         public void FoundReal() 
         {
             foundLexeme = null;
@@ -658,7 +567,7 @@ namespace Compiler.Lexer
                         cursor = j + 1;
                         if (lastLineFile[j] == '}') return;
                     }
-                    NewLine();
+                    GetNextLine();
                 }
                 if (lastLineFile == null)
                 {
@@ -669,19 +578,8 @@ namespace Compiler.Lexer
                 }
             }
         }
-        public void NewLine()
-        {
-            lastLineFile = reader.ReadLine();
 
-            symbolNum = 0;
-            cursor = 0;
-            lineNum += 1;
-
-            return;
-        }
-
-
-        private object SearchValueLexeme()
+        private object GetValueLexeme()
         {
             if (currentState == State.Identifier)
             {
@@ -802,64 +700,18 @@ namespace Compiler.Lexer
 
                 return value;
             }
-            if (currentState == State.NumSystem_2 || currentState == State.NumSystem_8 || currentState == State.NumSystem_16)
-            {
-                int numSystem = 10;
-                long numValue = 0;
-                switch (currentState)
-                {
-                    case State.NumSystem_2:
-                        {
-                            numSystem = 2;
-                            break;
-                        }
-                    case State.NumSystem_8:
-                        {
-                            numSystem = 8;
-                            break;
-                        }
-                    case State.NumSystem_16:
-                        {
-                            numSystem = 16;
-                            break;
-                        }
-                }
-                if (foundLexeme.Length < 2)
-                {
-                    currentState = State.Error;
-                    error = $"({lineNum},{symbolNum}) Error: Invalid integer expression";
-                    lastLexeme = new LexemeData(lineNum, symbolNum, LexemeType.ERROR, error, null);
-                    currentState = State.Error;
-                    return "";
-                }
-                for (int j = 1; j < foundLexeme.Length; j++)
-                {
-                    for (int k = 1; k < foundLexeme.Length; k++)
-                    {
-                    }
-                    if ((foundLexeme[j] >= 'A' && foundLexeme[j] <= 'F') ||
-                        (foundLexeme[j] >= 'a' && foundLexeme[j] <= 'f'))
-                    {
-                        uint aUint = ((uint)char.ToLower(foundLexeme[j]) - (uint)'a') + 10;
-                        numValue = (numValue * numSystem) + aUint;
-                    }
-                    else
-                        numValue = (numValue * numSystem) + (foundLexeme[j] - '0');
-                }
-
-                if (numValue > 2147483647)
-                {
-                    currentState = State.Error;
-                    error = $"({lineNum},{symbolNum}) Fatal: Going outside";
-                    lastLexeme = new LexemeData(lineNum, symbolNum, LexemeType.ERROR, error, null);
-                    currentState = State.Error;
-                    return "";
-                }
-                currentState = State.Integer;
-                return numValue;
-            }
-
             return foundLexeme;
+        }
+
+        public void GetNextLine()
+        {
+            lastLineFile = reader.ReadLine();
+
+            symbolNum = 0;
+            cursor = 0;
+            lineNum += 1;
+
+            return;
         }
     }
 
