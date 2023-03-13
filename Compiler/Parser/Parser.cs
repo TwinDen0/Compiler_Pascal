@@ -15,6 +15,7 @@
             builtins.Add("string", new SymString("string"));
             builtins.Add("write", new SymProc("write"));
             builtins.Add("read", new SymProc("read"));
+            builtins.Add("exit", new SymProc("exit"));
             symTableStack.AddTable(new SymTable(builtins));
             symTableStack.AddTable(new SymTable(new Dictionary<string, Symbol>()));
             GetNextLexeme();

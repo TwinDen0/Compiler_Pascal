@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Xml.Linq;
 
 namespace Compiler
 {
@@ -20,17 +21,23 @@ namespace Compiler
         // simple_stmt ::= "exit" | call | assignment
         public NodeStatement ParseSimpleStmt()
         {
+            string name;
             SymVar symVar;
             int lineStart = current_lexeme.NumbLine;
             int symStart = current_lexeme.NumbSymbol;
+
+            name = (string)current_lexeme.LexemeValue;
+            Symbol sym = symTableStack.Get((string)current_lexeme.LexemeValue);
 
             if (Expect(KeyWord.EXIT))
             {
                 GetNextLexeme();
                 return new CallStmt((SymProc)symTableStack.Get("exit"), null);
             }
-            symVar = (SymVar)symTableStack.Get((string)current_lexeme.LexemeValue);
+
+            //symVar = (SymVar)sym;
             Lexeme id = current_lexeme;
+
             GetNextLexeme();
             if (Expect(Separator.OPEN_PARENTHESIS))
             {

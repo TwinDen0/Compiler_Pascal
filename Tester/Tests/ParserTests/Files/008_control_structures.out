@@ -1,15 +1,15 @@
-program checkif
+CheckIf
 ├─── var
-│    └─── :
-│         ├─── i
-│         └─── integer
-└─── begin
-     ├─── if
-     │    ├─── >
-     │    │    ├─── i
-     │    │    └─── 5
-     │    ├─── write
-     │    │    └─── 'yes'
-     │    └─── write
-     │         └─── 'no'
-     └─── end
+│    └─── integer
+│         └─── i
+├─── begin
+│    └─── if
+│         ├─── >
+│         │    ├─── i
+│         │    └─── 5
+│         ├─── write
+│         │    └─── "yes"
+│         else
+│         └─── write
+│              └─── "no"
+└─── end

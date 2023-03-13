@@ -94,7 +94,15 @@ namespace Compiler
         }
         public override string ToString(string indent, bool last)
         {
-            string operation = Lexer.convert_sign.Where(x => x.Value == (object)_opname).FirstOrDefault().Key;
+            string operation = _opname.ToString();
+            if (operation != null)
+            {
+                operation = operation.ToLower();
+            }
+            if (_opname.GetType() == typeof(Operation))
+            {
+                operation = Lexer.convert_sign.FirstOrDefault(x => x.Value.ToString() == _opname.ToString()).Key;
+            }
             return operation + "\r\n" +
                 indent + NodePrefix(true) + _left.ToString(indent + ChildrenPrefix(true), true) + "\r\n" +
                 indent + NodePrefix(false) + _right.ToString(indent + ChildrenPrefix(false), false);
@@ -117,6 +125,22 @@ namespace Compiler
         public override SymType CalcType()
         {
             return _arg.CalcType();
+        }
+        public override string ToString(string indent, bool last)
+        {
+            string str;
+            string? opnameStr = _opname.ToString();
+            if (opnameStr != null)
+            {
+                opnameStr = opnameStr.ToLower();
+            }
+            if (_opname.GetType() == typeof(Operation))
+            {
+                opnameStr = Lexer.convert_sign.FirstOrDefault(x => x.Value.ToString() == _opname.ToString()).Key;
+            }
+            str = $"{opnameStr}\r\n";
+            str += indent + NodePrefix(false) + _arg.ToString(indent + ChildrenPrefix(false), true);
+            return str;
         }
     }
     public class NodeArrayElement : NodeExpression

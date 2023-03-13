@@ -25,7 +25,7 @@ namespace Compiler
         static void Main(string[] args)
         {
             
-            string filePath = "../../../../Tester/Tests/ParserTests/Files/006_control_structures.in";
+            string filePath = "../../../../Tester/Tests/ParserTests/Files/009_control_structures.in";
 
             var lexer = new Lexer(filePath);
             var parser = new Parser(lexer);

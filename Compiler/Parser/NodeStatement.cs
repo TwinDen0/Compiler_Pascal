@@ -60,6 +60,35 @@ namespace Compiler
             _proc = proc;
             _args = arg;
         }
+        public override string ToString(string indent, bool last)
+        {
+            string str = null;
+            str = $"{_proc.GetName()}";
+            if (_args != null && _args.Count > 0)
+            {
+                str += $"\r\n";
+                int i = 1;
+                foreach (NodeExpression? arg in _args)
+                {
+                    if (i == _args.Count)
+                    {
+                        if (arg != null)
+                        {
+                            str += indent + NodePrefix(false) + arg.ToString(indent + ChildrenPrefix(true), true);
+                        }
+                    }
+                    else
+                    {
+                        if (arg != null)
+                        {
+                            str += indent + NodePrefix(true) + arg.ToString(indent + ChildrenPrefix(true), true);
+                        }
+                        i++;
+                    }
+                }
+            }
+            return str;
+        }
     }
     public class IfStmt : NodeStatement
     {
@@ -71,6 +100,17 @@ namespace Compiler
             _condition = condition;
             _if_body = if_body;
             _else_body = else_Body;
+        }
+        public override string ToString(string indent, bool last)
+        {
+            string str = null;
+            //string prefix = GetPrefixNode(isLeftParents);
+            str += "if \r\n";
+            str += indent + NodePrefix(true) + _condition.ToString(indent + ChildrenPrefix(true), true) + "\r\n";
+            str += indent + NodePrefix(true) + _if_body.ToString(indent + ChildrenPrefix(true), true) + "\r\n";
+            str += indent + "else\r\n";
+            str += indent + NodePrefix(false) + _else_body.ToString(indent + ChildrenPrefix(false), true) + "\r\n";
+            return str;
         }
     }
     public class ForStmt : NodeStatement
