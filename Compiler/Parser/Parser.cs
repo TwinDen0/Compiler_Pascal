@@ -1,200 +1,114 @@
-﻿using Compiler.Lexer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Reflection.PortableExecutable;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Compiler.Parser
+﻿namespace Compiler
 {
-    public enum NodeType
+    public partial class Parser
     {
-        Number,
-        Identifier,
-        BinOperation,
-        Error
-    }
-    public class Node
-    {
-        public NodeType type;
-        public object value;
-        public List<Node> children;
-    }
-    public class Parser
-    {
-        public LexemeData CurrectLexem;
-        public Lexer.Lexer lexer;
-        int notClosedBracket;
-        public Node resParser;
-
-        public Parser(string filePath)
+        private Lexer _lexer;
+        Lexeme current_lexeme;
+        SymTableStack symTableStack;
+        public Parser(Lexer lexer)
         {
-            CurrectLexem = null;
-            lexer = new Lexer.Lexer(filePath);
-            notClosedBracket = 0;
-            resParser = new Node();
+            _lexer = lexer;
+            symTableStack = new SymTableStack();
+            Dictionary<string, Symbol> builtins = new Dictionary<string, Symbol>();
+            builtins.Add("integer", new SymInteger("integer"));
+            builtins.Add("real", new SymReal("real"));
+            builtins.Add("string", new SymString("string"));
+            builtins.Add("write", new SymProc("write"));
+            builtins.Add("read", new SymProc("read"));
+            symTableStack.AddTable(new SymTable(builtins));
+            symTableStack.AddTable(new SymTable(new Dictionary<string, Symbol>()));
+            GetNextLexeme();
         }
-        
-        public Node GetParser()
+        void GetNextLexeme()
         {
-            resParser = new Node();
-
-            CurrectLexem = lexer.GetLexeme();
-
-            resParser = ExpSimple();
-
-            if (CurrectLexem.LexemeType == LexemeType.ERROR)
-            {
-                resParser = new Node()
-                {
-                    type = NodeType.Error,
-                    value = $"({lexer.lineNum},{lexer.symbolNum - 1}) Fatal: Syntax error, \";\" expected but \"{CurrectLexem.LexemeValue}\" found"
-                };
-            }
-
-            lexer.lineNum = 1;
-            lexer.symbolNum = 0;
-            return resParser;
+            current_lexeme = _lexer.NextLexeme();
         }
 
-        public Node ExpSimple()
+        private bool Expect(params object[] requires)
         {
-        Node leftСhild = Term();
-
-        while ((CurrectLexem.LexemeValue.ToString() == "+" || CurrectLexem.LexemeValue.ToString() == "-") && CurrectLexem.LexemeType == LexemeType.OPERATOR)
-        {
-            var operation = CurrectLexem.LexemeValue;
-
-            if (CurrectLexem.LexemeType != LexemeType.ENDFILE)
+            if (requires[0].GetType() == typeof(LexemeType))
             {
-                CurrectLexem = lexer.GetLexeme();
-            }
-            Node rightСhild = Term();
-            leftСhild = new Node()
-            {
-                type = NodeType.BinOperation,
-                value = operation,
-                children = new List<Node> { leftСhild, rightСhild }
-            };
-
-            if (rightСhild.type == NodeType.Error)
-            {
-                return new Node()
+                foreach (LexemeType type in requires)
                 {
-                    type = NodeType.Error,
-                    value = rightСhild.value
-                };
-            }
-        }
-
-        return leftСhild;
-    }
-
-        public Node Term()
-        {
-            Node leftСhild = Factor();
-
-            if (leftСhild.type != NodeType.Error)
-            {
-                CurrectLexem = lexer.GetLexeme();
-                while ((CurrectLexem.LexemeValue.ToString() == "*" || CurrectLexem.LexemeValue.ToString() == "/") && CurrectLexem.LexemeType == LexemeType.OPERATOR)
-                {
-                    var operation = CurrectLexem.LexemeValue;
-                    if (CurrectLexem.LexemeType != LexemeType.ENDFILE)
+                    if (current_lexeme.LexemeType == type)
                     {
-                        CurrectLexem = lexer.GetLexeme();
-                    }
-                    Node rightСhild = Factor();
-                    if (CurrectLexem.LexemeType != LexemeType.ENDFILE)
-                    {
-                        CurrectLexem = lexer.GetLexeme();
-                    }
-
-                    leftСhild = new Node()
-                    {
-                        type = NodeType.BinOperation,
-                        value = operation,
-                        children = new List<Node> { leftСhild, rightСhild }
-                    };
-
-                    if (rightСhild.type == NodeType.Error)
-                    {
-                        return new Node()
-                        {
-                            type = NodeType.Error,
-                            value = rightСhild.value
-                        };
+                        return true;
                     }
                 }
+                return false;
             }
-            return leftСhild;
+            else
+            {
+                foreach (object require in requires)
+                {
+                    if (Equals(current_lexeme.LexemeValue, require))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
         }
-
-        public Node Factor()
+        private void Require(params object[] requires)
         {
-
-            if (CurrectLexem.LexemeType == LexemeType.INTEGER || CurrectLexem.LexemeType == LexemeType.REAL)
+            if (!Expect(requires))
             {
-                LexemeData factor = CurrectLexem;
-
-                return new Node()
+                if (requires[0].GetType() == typeof(LexemeType))
                 {
-                    type = NodeType.Number,
-                    value = factor.LexemeValue
-                };
-            }
-            if (CurrectLexem.LexemeType == LexemeType.IDENTIFIER)
-            {
-                LexemeData factor = CurrectLexem;
-
-                return new Node()
-                {
-                    type = NodeType.Identifier,
-                    value = factor.LexemeValue
-                };
-            }
-            if (CurrectLexem.LexemeValue.ToString() == "(" && CurrectLexem.LexemeType == LexemeType.SEPARATOR)
-            {
-                Node newExp = new Node();
-                if (CurrectLexem.LexemeType != LexemeType.ENDFILE)
-                {
-                    CurrectLexem = lexer.GetLexeme();
-                    newExp = ExpSimple();
+                    throw new ExceptionCompiler($"({current_lexeme.NumbLine},{current_lexeme.NumbSymbol}) expected {requires[0]}");
                 }
                 else
                 {
-                    newExp = new Node()
+                    if (requires[0].GetType() == typeof(Separator) || requires[0].GetType() == typeof(Operation))
                     {
-                        type = NodeType.Error,
-                        value = $"({lexer.lineNum},{lexer.symbolNum - 1}) Fatal: Syntax error, \")\" expected"
-                    };
-                }
-
-                if (CurrectLexem.LexemeValue.ToString() != ")" || CurrectLexem.LexemeType != LexemeType.SEPARATOR)
-                {
-                    if (CurrectLexem.LexemeType != LexemeType.ENDFILE)
-                    {
-                        notClosedBracket += 1;
+                        requires[0] = Lexer.convert_sign.Where(x => x.Value == (object)requires[0]).FirstOrDefault().Key;
                     }
-                    else
-                    {
-                        newExp = new Node()
-                        {
-                            type = NodeType.Error,
-                            value = $"({lexer.lineNum},{lexer.symbolNum - 1}) Fatal: Syntax error, \")\" expected"
-                        };
-                    }
+                    throw new ExceptionCompiler($"expected '{requires[0]}'");
                 }
-                return newExp;
             }
-
-            return new Node()
+            if (requires[0].GetType() != typeof(LexemeType))
             {
-                type = NodeType.Error,
-                value = $"({lexer.lineNum},{lexer.symbolNum - 1}) Fatal: Syntax error, don't have factor"
-            };
+                GetNextLexeme();
+            }
+        }
+
+        // mainProgram ::= ['progam' identifier ';'] {declarations} block '.'
+        public NodeMainProgram ParseProgram()
+        {
+            string name_program = null;
+            List<NodeDefs> types = new List<NodeDefs>();
+            BlockStmt body;
+            if (Expect(KeyWord.PROGRAM))
+            {
+                GetNextLexeme();
+                Require(LexemeType.IDENTIFIER);
+                name_program = current_lexeme.LexemeValue.ToString();
+                GetNextLexeme();
+                Require(Separator.SEMICOLON);
+            }
+            types = ParseDefs();
+            Require(KeyWord.BEGIN);
+            body = ParseBlock();
+            Require(Separator.POINT);
+            return new NodeMainProgram(name_program, types, body);
+        }
+
+        //  block ::= "begin" [(statement) {";" (statement)}] "end"
+        public BlockStmt ParseBlock()
+        {
+            List<NodeStatement> body = new List<NodeStatement>();
+            while (!Expect(KeyWord.END))
+            {
+                body.Add(ParseStatement());
+                if (Expect(Separator.SEMICOLON))
+                {
+                    GetNextLexeme();
+                    continue;
+                }
+                Require(KeyWord.END);
+            }
+            Require(KeyWord.END);
+            return new BlockStmt(body);
         }
     }
 }

@@ -1,0 +1,6 @@
+program CheckWhile;
+var
+i : integer;
+begin
+while i > 5 do i -= 1;
+end.

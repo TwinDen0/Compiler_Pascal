@@ -1,3 +1,1 @@
-1	1	STRING	y	#255
-2	1	STRING	A	#256
-EndFile
+1	1	STRING	aa #100 aa	'aa #100 aa'

@@ -1,0 +1,14 @@
+program checkwhile
+├─── var
+│    └─── :
+│         ├─── i
+│         └─── integer
+└─── begin
+     ├─── while
+     │    ├─── >
+     │    │    ├─── i
+     │    │    └─── 5
+     │    └─── -=
+     │         ├─── i
+     │         └─── 1
+     └─── end

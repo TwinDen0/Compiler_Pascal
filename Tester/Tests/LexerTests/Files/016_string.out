@@ -1,3 +1,1 @@
-1	1	IDENTIFIER	a	a
-1	3	STRING	aa	'aa'
-EndFile
+(1,2) Fatal: Lexical error, for Identifier not expected "'"

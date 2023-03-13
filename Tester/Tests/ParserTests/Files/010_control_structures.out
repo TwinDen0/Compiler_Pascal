@@ -1,0 +1,15 @@
+program checkfor
+├─── var
+│    └─── :
+│         ├─── i
+│         └─── integer
+└─── begin
+     ├─── for
+     │    ├─── :=
+     │    │    ├─── i
+     │    │    └─── 5
+     │    ├─── to
+     │    │    └─── 6
+     │    └─── write
+     │         └─── i
+     └─── end

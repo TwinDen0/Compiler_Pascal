@@ -1,0 +1,51 @@
+mainProgram ::= ["progam" id ";"] {declarations} block "."
+
+block ::= "begin" [statement {";" statement}] "end"
+
+-----DECLARETIONS-----
+
+declarations ::= var_declaration | const_declaration | type_declaration | procedure_declaration
+
+var_declaration ::= "var" one_var_declaration {one_var_declaration}
+one_var_declaration ::= id {"," id} ":" type ";" | id ":" type "=" expression ";"
+
+const_declaration ::= "const" one_const_declaration {one_const_declaration}
+one_const_declaration ::= id ":" type "=" exp ";"
+
+type_declaration ::= "type" one_type_declaration {one_type_declaration}
+one_type_declaration ::= id "=" type
+
+procedure_declaration ::= "procedure" id [procedure_parameters] ";" {var_declaration | const_declaration | type_declaration} block ";"
+procedure_parameters ::= "(" ["var"|"out"] one_var_declaration {";" ["var"|"out"] one_var_declaration} ")"
+
+-----STATEMENT-----
+
+statement ::= simple_stmt | struct_stmt
+
+simple_stmt ::= call | assignment | "exit"
+call ::= id "(" [factor { "," factor }] ")"
+assignment ::= (id | record_element | array_element) (":=" | "+=" | "-=" | "*=" | "/=") expression
+	array_element ::= id "[" simple_expression "]" {"[" simple_expression "]"}
+	record_element ::= id "." id
+
+struct_stmt ::=  if | for | while | repeat | block
+if ::= "if" expression "then" statement ["else" statement]
+for ::= "for" id ":=" simple_expression "to" simple_expression "do" statement
+while ::= "while" expression "do" statement
+repeat ::= "repeat" {statement ";"} "until" expression
+
+-----EXPRESSIONS-----
+
+expression ::= simple_expression ("<" | "<=" | ">" | ">=" | "=" | "<>") simple_expression
+simple_expression ::= term { ("or" | "+" | "-") term }
+term ::= factor { ( "and" | "/" | "*" ) factor } 
+factor ::= string | int | real | call |  variable | "(" expression ")"| record_element | array_element | ["+" | "-"] factor
+
+-----TYPE-----
+
+type ::= primitive_type | array_type | record_type | original_type
+
+primitive_type ::= "integer" | "real" | "string" 
+array_type ::= "array" "[" (ordinal_type) { "," (ordinal_type) } "]" "of" primitive_type
+ordinal_type ::= simple_expression ".." simple_expression
+record_type ::= "record" {one_var_declaration} "end"

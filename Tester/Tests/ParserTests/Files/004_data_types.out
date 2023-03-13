@@ -1,0 +1,11 @@
+CheckCompositeTypes
+├─── var
+│    └─── string
+│         └─── a
+├─── begin
+│    └─── +=
+│         ├─── a
+│         └─── "hello"
+└─── end
+
+

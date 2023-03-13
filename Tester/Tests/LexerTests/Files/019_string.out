@@ -1,1 +1,4 @@
-(1,2) Fatal: Syntax error, ";" expected
+1	1	STRING	y	#255
+2	1	STRING	A	#256
+3	1	STRING	?	#65535
+(4,1) Fatal: Overflow symbol in string

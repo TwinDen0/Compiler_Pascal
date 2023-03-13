@@ -1,0 +1,6 @@
+program CheckCompositeTypes;
+var
+a : integer;
+begin
+a := 5 + 5;
+end.

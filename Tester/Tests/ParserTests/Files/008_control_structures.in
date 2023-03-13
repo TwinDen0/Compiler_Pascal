@@ -1,0 +1,6 @@
+program CheckIf;
+var
+i : integer;
+begin
+if i > 5 then write('yes') else write('no');
+end.

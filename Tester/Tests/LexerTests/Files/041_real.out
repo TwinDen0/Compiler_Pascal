@@ -1,2 +1,1 @@
-1	1	REAL	12,2	12.2
-EndFile
+(1,3) Fatal: Lexical error, real cannot contain "e" more than once

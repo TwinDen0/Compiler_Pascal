@@ -1,2 +1,4 @@
-1	1	STRING	qw123#$%^&*(//	'qw123#$%^&*(//'
-EndFile
+1	1	IDENTIFIER	a	a
+1	3	STRING	aa	'aa'
+2	1	STRING	aa	'aa'
+2	6	IDENTIFIER	a	a

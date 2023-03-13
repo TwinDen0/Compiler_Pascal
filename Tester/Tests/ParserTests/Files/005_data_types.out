@@ -1,0 +1,13 @@
+CheckCompositeTypes
+├─── var
+│    └─── integer
+│         └─── a
+├─── begin
+│    └─── :=
+│         ├─── a
+│         └─── *
+│              ├─── a
+│              └─── a
+└─── end
+
+

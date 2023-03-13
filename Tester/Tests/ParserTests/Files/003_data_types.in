@@ -1,0 +1,8 @@
+program CheckCompositeTypes;
+var
+a : integer;
+c : real;
+begin
+a := 5;
+c := 5.5 + a;
+end.

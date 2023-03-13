@@ -1,0 +1,4 @@
+program CheckIf;
+begin
+if 6 > 5 then write('yes');
+end.
