@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Compiler
 {
@@ -47,6 +48,7 @@ namespace Compiler
     public class SymVarConst : SymVar
     {
         public SymVarConst(string name, SymType type) : base(name, type) { }
+
     }
     public class SymVarGlobal : SymVar
     {

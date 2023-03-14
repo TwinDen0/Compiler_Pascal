@@ -226,6 +226,7 @@ namespace Compiler
             GetNextLexeme();
             Require(LexemeType.IDENTIFIER);
             control_var = new NodeVar((SymVar)symTableStack.Get((string)current_lexeme.LexemeValue));
+            GetNextLexeme();
             Require(Operation.ASSIGNMENT);
             start = ParseSimpleExpression();
             if (!Expect(KeyWord.TO, KeyWord.DOWNTO))

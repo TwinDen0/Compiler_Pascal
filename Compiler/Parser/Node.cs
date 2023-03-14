@@ -15,7 +15,7 @@ namespace Compiler
             return "";
         }
 
-        public static string NodePrefix(bool last)
+        public static string Prefix(bool last)
         {
             return last ? "├─── " : "└─── ";
         }
@@ -40,7 +40,14 @@ namespace Compiler
         public override string ToString()
         {
             string str = null;
-            str = _name + "\r\n";
+            if(_name != null)
+            {
+                str = _name + "\r\n";
+            }
+            else
+            {
+                str = "program\r\n";
+            }
             foreach (NodeDefs type in _types)
             {
                 str += type.ToString(ChildrenPrefix(true), true);

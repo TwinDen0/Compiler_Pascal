@@ -104,8 +104,8 @@ namespace Compiler
                 operation = Lexer.convert_sign.FirstOrDefault(x => x.Value.ToString() == _opname.ToString()).Key;
             }
             return operation + "\r\n" +
-                indent + NodePrefix(true) + _left.ToString(indent + ChildrenPrefix(true), true) + "\r\n" +
-                indent + NodePrefix(false) + _right.ToString(indent + ChildrenPrefix(false), false);
+                indent + Prefix(true) + _left.ToString(indent + ChildrenPrefix(true), true) + "\r\n" +
+                indent + Prefix(false) + _right.ToString(indent + ChildrenPrefix(false), false);
         }
     }
     public class NodeRecordAccess : NodeBinOp
@@ -139,7 +139,7 @@ namespace Compiler
                 opnameStr = Lexer.convert_sign.FirstOrDefault(x => x.Value.ToString() == _opname.ToString()).Key;
             }
             str = $"{opnameStr}\r\n";
-            str += indent + NodePrefix(false) + _arg.ToString(indent + ChildrenPrefix(false), true);
+            str += indent + Prefix(false) + _arg.ToString(indent + ChildrenPrefix(false), true);
             return str;
         }
     }

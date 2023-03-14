@@ -1,0 +1,6 @@
+program CheckDefs;
+const
+a,b = 5;
+begin
+;
+end.

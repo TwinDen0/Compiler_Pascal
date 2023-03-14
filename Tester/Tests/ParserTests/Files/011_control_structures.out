@@ -1,15 +1,14 @@
-program checkfor
+CheckFor
 ├─── var
-│    └─── :
-│         ├─── i
-│         └─── integer
-└─── begin
-     ├─── for
-     │    ├─── :=
-     │    │    ├─── i
-     │    │    └─── 5
-     │    ├─── downto
-     │    │    └─── 6
-     │    └─── write
-     │         └─── i
-     └─── end
+│    └─── integer
+│         └─── i
+├─── begin
+│    └─── for
+│         ├─── :=
+│         │    ├─── i
+│         │    └─── 5
+│         ├─── downto
+│         │    └─── 6
+│         └─── write
+│              └─── i
+└─── end

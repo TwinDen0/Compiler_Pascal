@@ -15,7 +15,7 @@ namespace Compiler
         public override string ToString(string indent, bool last)
         {
             string str = null;
-            str += NodePrefix(last) + "var" + "\r\n";
+            str += Prefix(last) + "var" + "\r\n";
             foreach (VarDeclarationNode body in _body) 
             {
                 bool pref = true;
@@ -23,7 +23,7 @@ namespace Compiler
                 {
                     pref = false;
                 }
-                str += indent + NodePrefix(pref) + body.ToString(indent + ChildrenPrefix(pref), pref);
+                str += indent + Prefix(pref) + body.ToString(indent + ChildrenPrefix(pref), pref);
             }
             return str;
         }
@@ -38,7 +38,7 @@ namespace Compiler
         public override string ToString(string indent, bool last)
         {
             string str = null;
-            str += NodePrefix(last) + "const" + "\r\n";
+            str += Prefix(last) + "const" + "\r\n";
             foreach (ConstDeclarationNode body in _body)
             {
                 bool pref = true;
@@ -46,7 +46,7 @@ namespace Compiler
                 {
                     pref = false;
                 }
-                str += indent + NodePrefix(pref) + body.ToString(indent + ChildrenPrefix(pref), pref);
+                str += indent + Prefix(pref) + body.ToString(indent + ChildrenPrefix(pref), pref);
             }
             return str;
         }
@@ -61,7 +61,7 @@ namespace Compiler
         public override string ToString(string indent, bool last)
         {
             string str = null;
-            str += NodePrefix(last) + "type" + "\r\n";
+            str += Prefix(last) + "type" + "\r\n";
             foreach (DeclarationNode body in _body)
             {
                 bool pref = true;
@@ -69,7 +69,7 @@ namespace Compiler
                 {
                     pref = false;
                 }
-                str += indent + NodePrefix(pref) + body.ToString(indent + ChildrenPrefix(pref), pref);
+                str += indent + Prefix(pref) + body.ToString(indent + ChildrenPrefix(pref), pref);
             }
             return str;
         }
@@ -88,8 +88,8 @@ namespace Compiler
         public override string ToString(string indent, bool last)
         {
             string str = null;
-            str += NodePrefix(last) + "procedure " + _symProc.ToString() + "\r\n" +
-                indent + NodePrefix(true) + "parameters" + "\r\n";
+            str += Prefix(last) + "procedure " + _symProc.ToString() + "\r\n" +
+                indent + Prefix(true) + "parameters" + "\r\n";
             foreach (VarDeclarationNode param in _params)
             {
                 bool pref = true;
@@ -97,9 +97,9 @@ namespace Compiler
                 {
                     pref = false;
                 }
-                str += indent + ChildrenPrefix(last) + NodePrefix(pref) + param.ToString(indent + ChildrenPrefix(last) + ChildrenPrefix(pref), pref);
+                str += indent + ChildrenPrefix(last) + Prefix(pref) + param.ToString(indent + ChildrenPrefix(last) + ChildrenPrefix(pref), pref);
             }
-            str += indent + NodePrefix(true) + "local_types" + "\r\n";
+            str += indent + Prefix(true) + "local_types" + "\r\n";
             foreach (NodeDefs local_type in _localsTypes)
             {
                 bool pref = true;
@@ -136,7 +136,7 @@ namespace Compiler
         }
         public override string ToString(string indent, bool last)
         {
-            string str = _type.ToString() + "\r\n";
+            string str = _type.ToString(indent + ChildrenPrefix(false), true) + "\r\n";
             if (_value == null)
             {
                 foreach (SymVar name in _vars_name)
@@ -146,13 +146,14 @@ namespace Compiler
                     {
                         pref = false;
                     }
-                    str += indent + NodePrefix(pref) + name.ToString() + "\r\n";
+                    str += indent + Prefix(pref) + name.ToString() + "\r\n";
                 }
             } 
             else
             {
-                str += indent + NodePrefix(true) + _vars_name[0].ToString() + "\r\n" + 
-                    indent + NodePrefix(false) + _value.ToString(indent + ChildrenPrefix(false), true) + "\r\n";
+                str += indent + Prefix(true) + _vars_name[0].ToString() + "\r\n" +
+                    indent + Prefix(false) + "=\r\n" +
+                    indent + ChildrenPrefix(false) + Prefix(false) + _value.ToString(indent + ChildrenPrefix(false), true) + "\r\n";
             }
             return str;
         }
@@ -169,8 +170,8 @@ namespace Compiler
         public override string ToString(string indent, bool last)
         {
             return "=" + "\r\n" + 
-                indent + NodePrefix(true) + _name.ToString() + "\r\n" +
-                indent + NodePrefix(false) + _value.ToString(indent + ChildrenPrefix(false), true) + "\r\n";
+                indent + Prefix(true) + _name.ToString() + "\r\n" +
+                indent + Prefix(false) + _value.ToString(indent + ChildrenPrefix(false), true) + "\r\n";
         }
     }
     public class TypeDeclarationNode : DeclarationNode
@@ -185,8 +186,8 @@ namespace Compiler
         public override string ToString(string indent, bool last)
         {
             return "=" + "\r\n" +
-                indent + NodePrefix(true) + _name.ToString() + "\r\n" +
-                indent + NodePrefix(false) + _type.ToString() + "\r\n";
+                indent + Prefix(true) + _name.ToString() + "\r\n" +
+                indent + Prefix(false) + _type.ToString(indent, false) + "\r\n";
         }
     }
 }

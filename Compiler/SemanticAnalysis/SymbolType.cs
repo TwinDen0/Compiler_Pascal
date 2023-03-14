@@ -73,5 +73,17 @@ namespace Compiler
         {
             _original = original;
         }
+        public override string ToString()
+        {
+            string name = GetName();
+            if (name == _original.ToString())
+            {
+                return name;
+            } 
+            else
+            {
+                return $"{name} ({_original.ToString()})";
+            }
+        }
     }
 }

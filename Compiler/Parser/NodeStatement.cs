@@ -6,6 +6,10 @@ namespace Compiler
     public class NullStmt : NodeStatement
     {
         public NullStmt() { }
+        public override string ToString(string indent, bool last)
+        {
+            return "\r\n";
+        }
     }
     public class AssignmentStmt : NodeStatement
     {
@@ -23,8 +27,8 @@ namespace Compiler
         {
             //string operation = Lexer.convert_sign.Where(x => x.Value == (object)_name).FirstOrDefault().Key;
             return _name + "\r\n" +
-                indent + NodePrefix(true) + _left.ToString(indent + ChildrenPrefix(true), true) + "\r\n" +
-                indent + NodePrefix(false) + _right.ToString(indent + ChildrenPrefix(false), false) + "\r\n";
+                indent + Prefix(true) + _left.ToString(indent + ChildrenPrefix(true), true) + "\r\n" +
+                indent + Prefix(false) + _right.ToString(indent + ChildrenPrefix(false), false) + "\r\n";
         }
     }
     public class BlockStmt : NodeStatement
@@ -37,7 +41,7 @@ namespace Compiler
         public override string ToString(string indent, bool last)
         {
             string str = null;
-            str += indent + NodePrefix(true) + "begin" + "\r\n";
+            str += indent + Prefix(true) + "begin" + "\r\n";
             foreach (NodeStatement body in _body)
             {
                 bool prefix = true;
@@ -45,9 +49,9 @@ namespace Compiler
                 { 
                     prefix = false;
                 }
-                str += indent + ChildrenPrefix(true) + NodePrefix(prefix) + body.ToString(indent + ChildrenPrefix(true) + ChildrenPrefix(prefix), true);
+                str += indent + ChildrenPrefix(true) + Prefix(prefix) + body.ToString(indent + ChildrenPrefix(true) + ChildrenPrefix(prefix), true);
             }
-            str += indent + NodePrefix(false) + "end" + "\r\n";
+            str += indent + Prefix(false) + "end" + "\r\n";
             return str;
         }
     }
@@ -74,14 +78,14 @@ namespace Compiler
                     {
                         if (arg != null)
                         {
-                            str += indent + NodePrefix(false) + arg.ToString(indent + ChildrenPrefix(true), true);
+                            str += indent + Prefix(false) + arg.ToString(indent + ChildrenPrefix(true), true);
                         }
                     }
                     else
                     {
                         if (arg != null)
                         {
-                            str += indent + NodePrefix(true) + arg.ToString(indent + ChildrenPrefix(true), true);
+                            str += indent + Prefix(true) + arg.ToString(indent + ChildrenPrefix(true), true);
                         }
                         i++;
                     }
@@ -104,29 +108,40 @@ namespace Compiler
         public override string ToString(string indent, bool last)
         {
             string str = null;
-            //string prefix = GetPrefixNode(isLeftParents);
             str += "if \r\n";
-            str += indent + NodePrefix(true) + _condition.ToString(indent + ChildrenPrefix(true), true) + "\r\n";
-            str += indent + NodePrefix(true) + _if_body.ToString(indent + ChildrenPrefix(true), true) + "\r\n";
+            str += indent + Prefix(true) + _condition.ToString(indent + ChildrenPrefix(true), true) + "\r\n";
+            str += indent + Prefix(true) + _if_body.ToString(indent + ChildrenPrefix(true), true) + "\r\n";
             str += indent + "else\r\n";
-            str += indent + NodePrefix(false) + _else_body.ToString(indent + ChildrenPrefix(false), true) + "\r\n";
+            str += indent + Prefix(false) + _else_body.ToString(indent + ChildrenPrefix(false), true) + "\r\n";
             return str;
         }
     }
     public class ForStmt : NodeStatement
     {
-        NodeVar _controlvar;
+        NodeVar _control_var;
         NodeExpression _start;
         KeyWord _keyword;
         NodeExpression _finalval;
         NodeStatement _body;
-        public ForStmt(NodeVar controlVar, NodeExpression initialVal, KeyWord toOrDownto, NodeExpression finalVal, NodeStatement body)
+        public ForStmt(NodeVar controlVar, NodeExpression initial_val, KeyWord toOrDownto, NodeExpression finalVal, NodeStatement body)
         {
-            _controlvar = controlVar;
-            _start = initialVal;
+            _control_var = controlVar;
+            _start = initial_val;
             _keyword = toOrDownto;
             _finalval = finalVal;
             _body = body;
+        }
+        public override string ToString(string indent, bool last)
+        {
+            string str = null;
+            str += "for \r\n";
+            str += indent + Prefix(true) + ":=\r\n";
+            str += indent + ChildrenPrefix(true) + Prefix(true) + _control_var.ToString(indent + ChildrenPrefix(true), true) + "\r\n";
+            str += indent + ChildrenPrefix(true) + Prefix(false) + _start.ToString(indent + ChildrenPrefix(true), true) + "\r\n";
+            str += indent + Prefix(true) + _keyword.ToString().ToLower() + "\r\n";
+            str += indent + ChildrenPrefix(true) + Prefix(false) + _finalval.ToString(indent + ChildrenPrefix(true), true) + "\r\n";
+            str += indent + Prefix(false) + _body.ToString(indent + ChildrenPrefix(false), true) + "\r\n";
+            return str;
         }
     }
     public class WhileStmt : NodeStatement
@@ -138,6 +153,14 @@ namespace Compiler
             _condition = condition;
             _body = body;
         }
+        public override string ToString(string indent, bool last)
+        {
+            string str = null;
+            str += "while \r\n";
+            str += indent + Prefix(true) + _condition.ToString(indent + ChildrenPrefix(true), true) + "\r\n";
+            str += indent + Prefix(false) + _body.ToString(indent + ChildrenPrefix(false), true);
+            return str;
+        }
     }
     public class RepeatStmt : NodeStatement
     {
@@ -147,6 +170,23 @@ namespace Compiler
         {
             _condition = condition;
             _body = body;
+        }
+        public override string ToString(string indent, bool last)
+        {
+            string str = null;
+            str = "repeat\r\n";
+            foreach (NodeStatement? stmt in _body)
+            {
+                if (stmt == _body.Last())
+                {
+                    str += indent + Prefix(true) + stmt.ToString(indent + ChildrenPrefix(true), true);
+                } else
+                {
+                    str += indent + Prefix(true) + stmt.ToString(indent + ChildrenPrefix(true), true) + "\r\n";
+                }
+            }
+            str += indent + Prefix(false) + _condition.ToString(indent + ChildrenPrefix(false), true) + "\r\n";
+            return str;
         }
     }
 }

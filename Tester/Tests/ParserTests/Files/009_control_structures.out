@@ -1,14 +1,13 @@
-program checkwhile
+CheckWhile
 ├─── var
-│    └─── :
-│         ├─── i
-│         └─── integer
-└─── begin
-     ├─── while
-     │    ├─── >
-     │    │    ├─── i
-     │    │    └─── 5
-     │    └─── -=
-     │         ├─── i
-     │         └─── 1
-     └─── end
+│    └─── integer
+│         └─── i
+├─── begin
+│    └─── while
+│         ├─── >
+│         │    ├─── i
+│         │    └─── 5
+│         └─── -=
+│              ├─── i
+│              └─── 1
+└─── end

@@ -1,0 +1,6 @@
+var 
+a: real;
+b,c : string;
+d : integer = 7;
+begin
+end.

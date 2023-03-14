@@ -19,13 +19,12 @@ using System.Threading.Tasks;
 
 namespace Compiler
 {
-
     public class Program
     {
         static void Main(string[] args)
         {
             
-            string filePath = "../../../../Tester/Tests/ParserTests/Files/009_control_structures.in";
+            string filePath = "../../../../Tester/Tests/ParserTests/Files/017_defs.in";
 
             var lexer = new Lexer(filePath);
             var parser = new Parser(lexer);

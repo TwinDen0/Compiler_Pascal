@@ -1,0 +1,14 @@
+program CheckDefs;
+type
+a = integer;
+b = a;
+var
+c : b = 5;
+d : integer = 7;
+type
+e = string;
+var
+f : e ;
+begin
+;
+end.

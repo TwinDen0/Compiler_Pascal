@@ -1,0 +1,6 @@
+const 
+a = 7;
+b = 4.3e10;
+c = 'hello';
+begin
+end.

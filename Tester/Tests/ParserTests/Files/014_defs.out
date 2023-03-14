@@ -1,0 +1,13 @@
+program
+├─── var
+│    ├─── real
+│    │    └─── a
+│    ├─── string
+│    │    ├─── b
+│    │    └─── c
+│    └─── integer
+│         ├─── d
+│         └─── =
+│              └─── 7
+├─── begin
+└─── end
