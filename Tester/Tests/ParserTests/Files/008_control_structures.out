@@ -3,7 +3,7 @@ CheckIf
 │    └─── integer
 │         └─── i
 ├─── begin
-│    └─── if
+│    └─── if 
 │         ├─── >
 │         │    ├─── i
 │         │    └─── 5
@@ -13,3 +13,5 @@ CheckIf
 │         └─── write
 │              └─── "no"
 └─── end
+
+

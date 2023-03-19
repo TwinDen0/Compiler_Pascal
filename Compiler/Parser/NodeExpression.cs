@@ -27,12 +27,11 @@ namespace Compiler
             _cast = cast;
             _exp = exp;
         }
-        public override string ToString(string indent, bool last)
+        public override string ToString(string prefix)
         {
             string res;
-            string prefix = indent;
             res = $"{_cast.GetName()}\r\n";
-            res += prefix + $"└─── {_exp.ToString(indent, true)}";
+            res += prefix + $"└─── {_exp.ToString(prefix)}";
             return res;
         }
     }
@@ -55,7 +54,7 @@ namespace Compiler
             string? opnameStr = _opname.ToString();
             if (_opname.GetType() == typeof(Operation))
             {
-                opnameStr = Lexer.convert_sign.Where(x => x.Value == (object)_opname).FirstOrDefault().Key;
+                opnameStr = Lexer.convert_sign.FirstOrDefault(x => x.Value.ToString() == (object)_opname.ToString()).Key;
             }
             if (leftType.GetType() != rightType.GetType() && opnameStr != ".")
             {
@@ -92,7 +91,7 @@ namespace Compiler
             }
             return leftType;
         }
-        public override string ToString(string indent, bool last)
+        public override string ToString(string prefix)
         {
             string operation = _opname.ToString();
             if (operation != null)
@@ -104,8 +103,8 @@ namespace Compiler
                 operation = Lexer.convert_sign.FirstOrDefault(x => x.Value.ToString() == _opname.ToString()).Key;
             }
             return operation + "\r\n" +
-                indent + Prefix(true) + _left.ToString(indent + ChildrenPrefix(true), true) + "\r\n" +
-                indent + Prefix(false) + _right.ToString(indent + ChildrenPrefix(false), false);
+                prefix + $"├─── {_left.ToString(prefix + ChildrenPrefix(true))}\r\n" +
+                prefix + $"└─── {_right.ToString(prefix + ChildrenPrefix(false))}";
         }
     }
     public class NodeRecordAccess : NodeBinOp
@@ -126,7 +125,7 @@ namespace Compiler
         {
             return _arg.CalcType();
         }
-        public override string ToString(string indent, bool last)
+        public override string ToString(string prefix)
         {
             string str;
             string? opnameStr = _opname.ToString();
@@ -139,7 +138,7 @@ namespace Compiler
                 opnameStr = Lexer.convert_sign.FirstOrDefault(x => x.Value.ToString() == _opname.ToString()).Key;
             }
             str = $"{opnameStr}\r\n";
-            str += indent + Prefix(false) + _arg.ToString(indent + ChildrenPrefix(false), true);
+            str += prefix + $"└─── {_arg.ToString(prefix + ChildrenPrefix(false))}";
             return str;
         }
     }
@@ -154,14 +153,14 @@ namespace Compiler
             _symArray = symArray;
             _args = arg;
         }
-        public override string ToString(string indent, bool last)
+        public override string ToString(string prefix)
         {
             string str = null;
-            str += $"{_name} [ ";
+            str += $"{_name}[";
             foreach (NodeExpression arg in _args)
             {
                 if (arg != _args.First()) { str += ", "; }
-                str += arg;
+                str += arg.ToString(prefix);
             }
             return str + "]";
         }
@@ -182,9 +181,13 @@ namespace Compiler
         {
             return _name.GetOriginalTypeVar();
         }
-        public override string ToString(string indent, bool last)
+        public SymVar GetSymVar()
         {
-            return _name.ToString();
+            return _name;
+        }
+        public override string ToString(string prefix)
+        {
+            return _name.ToString(prefix);
         }
     }
     public class NodeInt : NodeExpression
@@ -199,7 +202,7 @@ namespace Compiler
         {
             return new SymInteger("integer");
         }
-        public override string ToString(string indent, bool last)
+        public override string ToString(string prefix)
         {
             return _value.ToString();
         }
@@ -216,7 +219,7 @@ namespace Compiler
         {
             return new SymReal("real");
         }
-        public override string ToString(string indent, bool last)
+        public override string ToString(string prefix)
         {
             return _value.ToString();
         }
@@ -233,7 +236,7 @@ namespace Compiler
         {
             return new SymString("string");
         }
-        public override string ToString(string indent, bool last)
+        public override string ToString(string prefix)
         {
             return $"\"{_value}\"";
         }

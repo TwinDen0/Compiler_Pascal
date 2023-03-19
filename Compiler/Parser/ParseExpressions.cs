@@ -3,49 +3,49 @@
     public partial class Parser
     {
         //  expression ::= simple_expression ("<" | "<=" | ">" | ">=" | "=" | "<>") simple_expression
-        public NodeExpression ParseExpression()
+        public NodeExpression ParseExpression(bool inDef = false)
         {
-            NodeExpression left = ParseSimpleExpression();
+            NodeExpression left = ParseSimpleExpression(inDef);
             while (Expect(Operation.LESS, Operation.LESS_OR_EQUAL, Operation.GREATER, Operation.GREATER_OR_EQUAL, Operation.EQUAL, Operation.NOT_EQUAL))
             {
                 Operation operation = (Operation)current_lexeme.LexemeValue;
                 GetNextLexeme();
-                NodeExpression right = ParseSimpleExpression();
+                NodeExpression right = ParseSimpleExpression(inDef);
                 left = new NodeBinOp(operation, left, right);
             }
             return left;
         }
 
         //  simple_expression ::= term { ("or" | "+" | "-") term }
-        public NodeExpression ParseSimpleExpression()
+        public NodeExpression ParseSimpleExpression(bool inDef = false)
         {
-            NodeExpression left = ParseTerm();
+            NodeExpression left = ParseTerm(inDef);
             while (Expect(Operation.PLUS, Operation.MINUS, KeyWord.OR, KeyWord.XOR))
             {
                 object operation = current_lexeme.LexemeValue;
                 GetNextLexeme();
-                NodeExpression right = ParseTerm();
+                NodeExpression right = ParseSimpleExpression(inDef);
                 left = new NodeBinOp(operation, left, right);
             }
             return left;
         }
 
         //  term ::= factor { ( "and" | "/" | "*" ) factor } 
-        public NodeExpression ParseTerm()
+        public NodeExpression ParseTerm(bool inDef = false)
         {
-            NodeExpression left = ParseFactor();
+            NodeExpression left = ParseFactor(inDef);
             while (Expect(Operation.MULTIPLY, Operation.DIVIDE, KeyWord.AND))
             {
                 object operation = current_lexeme.LexemeValue;
                 GetNextLexeme();
-                NodeExpression right = ParseFactor();
+                NodeExpression right = ParseFactor(inDef);
                 left = new NodeBinOp(operation, left, right);
             }
             return left;
         }
 
         //  factor ::= ( string | ["+" | "-"] ( int | real) | call |  variable | "(" expression ")"| id "." id)
-        public NodeExpression ParseFactor()
+        public NodeExpression ParseFactor(bool inDef = false)
         {
             if (Expect(LexemeType.STRING))
             {
@@ -69,7 +69,7 @@
             {
                 NodeExpression exp;
                 GetNextLexeme();
-                exp = ParseExpression();
+                exp = ParseExpression(inDef);
                 Require(Separator.CLOSE_PARENTHESIS);
                 return exp;
             }
@@ -87,6 +87,10 @@
                 {
                     throw new ExceptionCompiler($"{current_lexeme.NumbLine}, {current_lexeme.NumbSymbol}) Identifier not found \"{factor.LexemeValue}\"");
                 }
+                if (inDef && symVar.GetType() != typeof(SymVarConst))
+                {
+                    throw new ExceptionCompiler($"{current_lexeme.NumbLine}, {current_lexeme.NumbSymbol}) Illegal expression");
+                }
                 ans = new NodeVar(symVar);
                 while (Expect(Separator.OPEN_BRACKET, Separator.POINT))
                 {
@@ -95,7 +99,7 @@
                     switch (separator)
                     {
                         case Separator.OPEN_BRACKET:
-                            ans = ParseArrayElement(ref symVar);
+                            ans = ParseArrayElement(ans, ref symVar);
                             break;
                         case Separator.POINT:
                             ans = ParseRecordElement(ans, ref symVar);
@@ -111,7 +115,7 @@
                 NodeExpression factor = ParseFactor();
                 return new NodeUnOp(unOp, factor);
             }
-            throw new ExceptionCompiler($"{current_lexeme.NumbLine}, {current_lexeme.NumbSymbol}) expected factor");
+            throw new ExceptionCompiler($"({current_lexeme.NumbLine}, {current_lexeme.NumbSymbol}) expected factor");
         }
     }
 }

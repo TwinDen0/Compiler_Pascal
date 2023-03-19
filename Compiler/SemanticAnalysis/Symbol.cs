@@ -18,7 +18,7 @@ namespace Compiler
         {
             return name;
         }
-        public override string ToString()
+        public override string ToString(string prefix)
         {
             return name;
         }
@@ -33,7 +33,7 @@ namespace Compiler
         public SymType GetOriginalTypeVar()
         {
             SymType buildsType = type;
-            while (buildsType.GetType().GetType() == typeof(SymTypeAlias))
+            while (buildsType.GetType().Name == "SymTypeAlias")
             {
                 SymTypeAlias symTypeAlias = (SymTypeAlias)buildsType;
                 buildsType = symTypeAlias.GetOriginalType();
@@ -47,12 +47,12 @@ namespace Compiler
     }
     public class SymVarConst : SymVar
     {
-        public SymVarConst(string name, SymType type) : base(name, type) { }
+        public NodeExpression value;
+        public SymVarConst(string name, SymType type, NodeExpression value) : base(name, type)
+        {
+            this.value = value;
+        }
 
-    }
-    public class SymVarGlobal : SymVar
-    {
-        public SymVarGlobal(string name, SymType type) : base(name, type) { }
     }
     public class SymParamVar : SymVar
     {

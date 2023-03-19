@@ -24,15 +24,15 @@ namespace Compiler
         static void Main(string[] args)
         {
             
-            string filePath = "../../../../Tester/Tests/ParserTests/Files/017_defs.in";
+               string filePath = "../../../../Tester/Tests/ParserTests/Files/02.in";
 
-            var lexer = new Lexer(filePath);
-            var parser = new Parser(lexer);
+               var lexer = new Lexer(filePath);
+               var parser = new Parser(lexer);
 
-            var node_main = parser.ParseProgram();
+               var node_main = parser.ParseProgram();
 
-            parser.PrintParse(node_main);
-            
+               parser.PrintParse(node_main);
+               /**/
 
             /*
             bool endfile = false;
@@ -56,16 +56,6 @@ namespace Compiler
                 }
             }
             /**/
-
-            //Parser parser = new Parser(lexer);
-            //Node firstNode = parser.ParseProgram();
-            //Console.WriteLine(firstNode.ToString());
-            //int i = 1;
-            /**/
-
-            //var parser = new Parser.Parser(filePath);
-            //var treeATC = parser.GetParser();
-            //Parser.PrintAST.Print(treeATC);
             /*
             if (args.Length == 0)
                 return;
@@ -110,7 +100,7 @@ namespace Compiler
             {
                 Console.Write($"{e}\r\n");
             }
-            */
+            /**/
         }
     }
 }

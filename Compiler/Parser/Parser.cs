@@ -1,4 +1,6 @@
-﻿namespace Compiler
+﻿using System.Xml.Linq;
+
+namespace Compiler
 {
     public partial class Parser
     {
@@ -56,15 +58,16 @@
             {
                 if (requires[0].GetType() == typeof(LexemeType))
                 {
-                    throw new ExceptionCompiler($"({current_lexeme.NumbLine},{current_lexeme.NumbSymbol}) expected {requires[0]}");
+                    throw new ExceptionCompiler($"({current_lexeme.NumbLine}, {current_lexeme.NumbSymbol}) Fatal: expected {requires[0]}");
                 }
                 else
                 {
+                    string? requiresStr = requires[0].ToString();
                     if (requires[0].GetType() == typeof(Separator) || requires[0].GetType() == typeof(Operation))
                     {
-                        requires[0] = Lexer.convert_sign.Where(x => x.Value == (object)requires[0]).FirstOrDefault().Key;
+                        requiresStr = Lexer.convert_sign.FirstOrDefault(x => x.Value.ToString() == requires[0].ToString()).Key;
                     }
-                    throw new ExceptionCompiler($"expected '{requires[0]}'");
+                    throw new ExceptionCompiler($"({current_lexeme.NumbLine}, {current_lexeme.NumbSymbol}) Fatal: expected '{requiresStr}'");
                 }
             }
             if (requires[0].GetType() != typeof(LexemeType))

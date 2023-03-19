@@ -42,7 +42,7 @@
         }
         public SymTable(SymTable original)
         {
-            this.data = new Dictionary<string, Symbol>(original.data);
+            data = new Dictionary<string, Symbol>(original.data);
         }
     }
     public class SymTableStack
@@ -59,6 +59,13 @@
         public void PopBack()
         {
             tables.RemoveAt(tables.Count - 1);
+        }
+        public void Check(string name)
+        {
+            if (GetBackTable().GetData().ContainsKey(name))
+            {
+                throw new Exception($"Duplicate identifier \"{name}\"");
+            }
         }
         public void Add(string name, Symbol value)
         {

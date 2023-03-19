@@ -3,7 +3,7 @@ CheckFor
 │    └─── integer
 │         └─── i
 ├─── begin
-│    └─── for
+│    └─── for 
 │         ├─── :=
 │         │    ├─── i
 │         │    └─── 5
@@ -12,3 +12,5 @@ CheckFor
 │         └─── write
 │              └─── i
 └─── end
+
+

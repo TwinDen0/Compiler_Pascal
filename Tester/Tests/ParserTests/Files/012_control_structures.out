@@ -2,7 +2,8 @@ CheckRepeat
 ├─── var
 │    └─── integer
 │         ├─── i
-│         └─── 5
+│         └─── =
+│              └─── 5
 ├─── begin
 │    └─── repeat
 │         ├─── write
@@ -14,3 +15,5 @@ CheckRepeat
 │              ├─── i
 │              └─── 0
 └─── end
+
+

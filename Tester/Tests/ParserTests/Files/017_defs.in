@@ -8,7 +8,7 @@ d : integer = 7;
 type
 e = string;
 var
-f : e ;
+f : e;
 begin
 ;
 end.

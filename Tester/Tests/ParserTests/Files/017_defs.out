@@ -1,34 +1,29 @@
-program checkdefs
+CheckDefs
 ├─── type
 │    ├─── =
-│    │    ├─── a
-│    │    └─── integer
+│    │    ├─── a 
+│    │    └─── integer 
 │    └─── =
-│         ├─── b
-│         └─── a
-│              └─── integer
+│         ├─── b 
+│         └─── a (integer) 
 ├─── var
-│    ├─── :
+│    ├─── b (a (integer))
 │    │    ├─── c
-│    │    ├─── b
-│    │    │    └─── a
-│    │    │         └─── integer
 │    │    └─── =
 │    │         └─── 5
-│    └─── :
+│    └─── integer
 │         ├─── d
-│         ├─── integer
 │         └─── =
 │              └─── 7
 ├─── type
 │    └─── =
-│         ├─── e
-│         └─── string
+│         ├─── e 
+│         └─── string 
 ├─── var
-│    └─── :
-│         ├─── f
-│         └─── e
-│              └─── string
-└─── begin
-     ├─── 
-     └─── end
+│    └─── e (string)
+│         └─── f
+├─── begin
+│    └─── 
+└─── end
+
+

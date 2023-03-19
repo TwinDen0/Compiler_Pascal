@@ -103,6 +103,11 @@ C:\Users\20kde\OneDrive\Рабочий стол\Compiler_Pascal\Tester\bin\Debug
 C:\Users\20kde\OneDrive\Рабочий стол\Compiler_Pascal\Tester\bin\Debug\net6.0\Compiler.dll
 C:\Users\20kde\OneDrive\Рабочий стол\Compiler_Pascal\Tester\bin\Debug\net6.0\Compiler.pdb
 C:\Git\Compiler_Pascal\Tester\bin\Debug\net6.0\CoverletSourceRootsMapping
+C:\Git\Compiler_Pascal\Tester\obj\Debug\net6.0\Tester.csproj.AssemblyReference.cache
+C:\Git\Compiler_Pascal\Tester\obj\Debug\net6.0\Tester.GeneratedMSBuildEditorConfig.editorconfig
+C:\Git\Compiler_Pascal\Tester\obj\Debug\net6.0\Tester.AssemblyInfoInputs.cache
+C:\Git\Compiler_Pascal\Tester\obj\Debug\net6.0\Tester.AssemblyInfo.cs
+C:\Git\Compiler_Pascal\Tester\obj\Debug\net6.0\Tester.csproj.CoreCompileInputs.cache
 C:\Git\Compiler_Pascal\Tester\bin\Debug\net6.0\testhost.dll
 C:\Git\Compiler_Pascal\Tester\bin\Debug\net6.0\Compiler.deps.json
 C:\Git\Compiler_Pascal\Tester\bin\Debug\net6.0\Compiler.runtimeconfig.json
@@ -195,11 +200,6 @@ C:\Git\Compiler_Pascal\Tester\bin\Debug\net6.0\zh-Hant\Microsoft.TestPlatform.Cr
 C:\Git\Compiler_Pascal\Tester\bin\Debug\net6.0\zh-Hant\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
 C:\Git\Compiler_Pascal\Tester\bin\Debug\net6.0\Compiler.dll
 C:\Git\Compiler_Pascal\Tester\bin\Debug\net6.0\Compiler.pdb
-C:\Git\Compiler_Pascal\Tester\obj\Debug\net6.0\Tester.csproj.AssemblyReference.cache
-C:\Git\Compiler_Pascal\Tester\obj\Debug\net6.0\Tester.GeneratedMSBuildEditorConfig.editorconfig
-C:\Git\Compiler_Pascal\Tester\obj\Debug\net6.0\Tester.AssemblyInfoInputs.cache
-C:\Git\Compiler_Pascal\Tester\obj\Debug\net6.0\Tester.AssemblyInfo.cs
-C:\Git\Compiler_Pascal\Tester\obj\Debug\net6.0\Tester.csproj.CoreCompileInputs.cache
 C:\Git\Compiler_Pascal\Tester\obj\Debug\net6.0\Tester.csproj.CopyComplete
 C:\Git\Compiler_Pascal\Tester\obj\Debug\net6.0\Tester.dll
 C:\Git\Compiler_Pascal\Tester\obj\Debug\net6.0\refint\Tester.dll

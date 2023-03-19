@@ -12,18 +12,20 @@ namespace Compiler
         {
             _body = body;
         }
-        public override string ToString(string indent, bool last)
+        public override string ToString(string prefix)
         {
             string str = null;
-            str += Prefix(last) + "var" + "\r\n";
+            str += "var" + "\r\n";
             foreach (VarDeclarationNode body in _body) 
             {
-                bool pref = true;
-                if (body == _body.Last())
+                if (body != _body.Last())
                 {
-                    pref = false;
+                    str += prefix + $"├─── {body.ToString(prefix + ChildrenPrefix(true))}";
+                } 
+                else
+                {
+                    str += prefix + $"└─── {body.ToString(prefix + ChildrenPrefix(false))}";
                 }
-                str += indent + Prefix(pref) + body.ToString(indent + ChildrenPrefix(pref), pref);
             }
             return str;
         }
@@ -35,18 +37,20 @@ namespace Compiler
         {
             _body = body;
         }
-        public override string ToString(string indent, bool last)
+        public override string ToString(string prefix)
         {
             string str = null;
-            str += Prefix(last) + "const" + "\r\n";
+            str += "const" + "\r\n";
             foreach (ConstDeclarationNode body in _body)
             {
-                bool pref = true;
-                if (body == _body.Last())
+                if (body != _body.Last())
                 {
-                    pref = false;
+                    str += prefix + $"├─── {body.ToString(prefix + ChildrenPrefix(true))}";
                 }
-                str += indent + Prefix(pref) + body.ToString(indent + ChildrenPrefix(pref), pref);
+                else
+                {
+                    str += prefix + $"└─── {body.ToString(prefix + ChildrenPrefix(false))}";
+                }
             }
             return str;
         }
@@ -58,18 +62,20 @@ namespace Compiler
         {
             _body = body;
         }
-        public override string ToString(string indent, bool last)
+        public override string ToString(string prefix)
         {
             string str = null;
-            str += Prefix(last) + "type" + "\r\n";
-            foreach (DeclarationNode body in _body)
+            str += "type" + "\r\n";
+            foreach (var body in _body)
             {
-                bool pref = true;
-                if (body == _body.Last())
+                if (body != _body.Last())
                 {
-                    pref = false;
+                    str += prefix + $"├─── {body.ToString(prefix + ChildrenPrefix(true))}";
                 }
-                str += indent + Prefix(pref) + body.ToString(indent + ChildrenPrefix(pref), pref);
+                else
+                {
+                    str += prefix + $"└─── {body.ToString(prefix + ChildrenPrefix(false))}";
+                }
             }
             return str;
         }
@@ -85,31 +91,35 @@ namespace Compiler
             _localsTypes = localsTypes;
             _symProc = symProc;
         }
-        public override string ToString(string indent, bool last)
+        public override string ToString(string prefix)
         {
             string str = null;
-            str += Prefix(last) + "procedure " + _symProc.ToString() + "\r\n" +
-                indent + Prefix(true) + "parameters" + "\r\n";
+            str += "procedure " + _symProc.GetName() + "\r\n" +
+                   prefix + "├─── parameters" + "\r\n";
             foreach (VarDeclarationNode param in _params)
             {
-                bool pref = true;
-                if (param == _params.Last())
+                if (param != _params.Last())
                 {
-                    pref = false;
+                    str += prefix + ChildrenPrefix(true) + $"├─── {param.ToString(prefix + ChildrenPrefix(true) + ChildrenPrefix(true))}";
                 }
-                str += indent + ChildrenPrefix(last) + Prefix(pref) + param.ToString(indent + ChildrenPrefix(last) + ChildrenPrefix(pref), pref);
+                else
+                {
+                    str += prefix + ChildrenPrefix(true) + $"└─── {param.ToString(prefix + ChildrenPrefix(true) + ChildrenPrefix(false))}";
+                }
             }
-            str += indent + Prefix(true) + "local_types" + "\r\n";
+            str += prefix + "├─── local_types" + "\r\n";
             foreach (NodeDefs local_type in _localsTypes)
             {
-                bool pref = true;
-                if (local_type == _localsTypes.Last())
+                if (local_type != _localsTypes.Last())
                 {
-                    pref = false;
+                    str += prefix + ChildrenPrefix(true) + $"├─── {local_type.ToString(prefix + ChildrenPrefix(true) + ChildrenPrefix(true))}";
                 }
-                str += indent + ChildrenPrefix(last) + local_type.ToString(indent + ChildrenPrefix(last) + ChildrenPrefix(pref), pref);
+                else
+                {
+                    str += prefix + ChildrenPrefix(true) + $"└─── {local_type.ToString(prefix + ChildrenPrefix(true) + ChildrenPrefix(false))}";
+                }
             }
-            str += _symProc.GetBody().ToString(indent, last);
+            str += _symProc.GetBody().ToString(prefix);
             return str;
         }
     }
@@ -134,44 +144,52 @@ namespace Compiler
         {
             return _value;
         }
-        public override string ToString(string indent, bool last)
+        public override string ToString(string prefix)
         {
-            string str = _type.ToString(indent + ChildrenPrefix(false), true) + "\r\n";
+            string str = _type.ToString(prefix + ChildrenPrefix(true)) + "\r\n";
             if (_value == null)
             {
                 foreach (SymVar name in _vars_name)
                 {
-                    bool pref = true;
-                    if (name == _vars_name.Last())
+                    if (name != _vars_name.Last())
                     {
-                        pref = false;
+                        str += prefix + $"├─── {name.GetName()}\r\n";
                     }
-                    str += indent + Prefix(pref) + name.ToString() + "\r\n";
+                    else
+                    {
+                        str += prefix + $"└─── {name.GetName()}\r\n";
+                    }
                 }
             } 
             else
             {
-                str += indent + Prefix(true) + _vars_name[0].ToString() + "\r\n" +
-                    indent + Prefix(false) + "=\r\n" +
-                    indent + ChildrenPrefix(false) + Prefix(false) + _value.ToString(indent + ChildrenPrefix(false), true) + "\r\n";
+                str += prefix + $"├─── {_vars_name[0].GetName()}\r\n" +
+                       prefix +  "└─── =\r\n" +
+                       prefix + $"     └─── { _value.ToString(prefix + ChildrenPrefix(false))}\r\n";
             }
             return str;
         }
     }
     public class ConstDeclarationNode : DeclarationNode
     {
-        string _name;
+        SymVarConst _var;
         NodeExpression _value;
-        public ConstDeclarationNode(string name, NodeExpression value)
+        public ConstDeclarationNode(SymVarConst var, NodeExpression value)
         {
-            _name = name;
-            _value = value;
+            this._var = var;
+            this._value = value;
+            if ((value.GetCachedType().GetType() != typeof(SymInteger)) &&
+                (value.GetCachedType().GetType() != typeof(SymReal)) &&
+                (value.GetCachedType().GetType() != typeof(SymString)))
+            {
+                throw new Exception($"Incompatible types");
+            }
         }
-        public override string ToString(string indent, bool last)
+        public override string ToString(string prefix)
         {
             return "=" + "\r\n" + 
-                indent + Prefix(true) + _name.ToString() + "\r\n" +
-                indent + Prefix(false) + _value.ToString(indent + ChildrenPrefix(false), true) + "\r\n";
+                prefix + $"├─── {_var.GetName()} \r\n" +
+                prefix + $"└─── {_value.ToString(prefix + ChildrenPrefix(false))} \r\n";
         }
     }
     public class TypeDeclarationNode : DeclarationNode
@@ -183,11 +201,11 @@ namespace Compiler
             _name = name;
             _type = type;
         }
-        public override string ToString(string indent, bool last)
+        public override string ToString(string prefix)
         {
             return "=" + "\r\n" +
-                indent + Prefix(true) + _name.ToString() + "\r\n" +
-                indent + Prefix(false) + _type.ToString(indent, false) + "\r\n";
+                prefix + $"├─── {_name.ToString()} \r\n" +
+                prefix + $"└─── {_type.ToString(prefix)} \r\n";
         }
     }
 }

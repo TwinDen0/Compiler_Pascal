@@ -5,6 +5,10 @@ namespace Compiler
     public class SymType : Symbol
     {
         public SymType(string name) : base(name) { }
+        public override string ToString(string prefix)
+        {
+            return $"{GetName()}";
+        }
     }
     public class SymInteger : SymType
     {
@@ -39,6 +43,17 @@ namespace Compiler
             _ordinal_types = ordinalTypes;
             _type = type;
         }
+        public override string ToString(string prefix)
+        {
+            string str;
+            str = $"array\r\n";
+            foreach (OrdinalTypeNode ordinalType in _ordinal_types)
+            {
+                str += prefix + $"├─── {ordinalType.ToString(prefix + ChildrenPrefix(true))}\r\n";
+            }
+            str += prefix + $"└─── {_type.ToString(prefix + ChildrenPrefix(true))}";
+            return str;
+        }
     }
     public class OrdinalTypeNode : Node
     {
@@ -48,6 +63,14 @@ namespace Compiler
         {
             _from = from;
             _to = to;
+        }
+        public override string ToString(string prefix)
+        {
+            string str;
+            str = $"..\r\n";
+            str += prefix + $"├─── {_from.ToString(prefix + ChildrenPrefix(true))}\r\n";
+            str += prefix + $"└─── {_to.ToString(prefix + ChildrenPrefix(true))}";
+            return str;
         }
     }
     public class SymRecord : SymType
@@ -61,6 +84,29 @@ namespace Compiler
         {
             _fields = fields;
         }
+        public override string ToString(string prefix)
+        {
+            string str;
+            str = $"record \r\n";
+            List<Symbol> sym_fields = new List<Symbol>(_fields.GetData().Values);
+            int i = 1;
+            foreach (Symbol symField in sym_fields)
+            {
+                SymVar varField = (SymVar)symField;
+                if (i == sym_fields.Count)
+                {
+                    str += prefix + $"└─── {varField.GetName()}\r\n";
+                    str += prefix + $"     └─── {varField.GetOriginalTypeVar().ToString(prefix + ChildrenPrefix(false))}";
+                }
+                else
+                {
+                    str += prefix + $"├─── {varField.GetName()}\r\n";
+                    str += prefix + $"│    └─── {varField.GetOriginalTypeVar().ToString(prefix + ChildrenPrefix(true))}\r\n";
+                    i++;
+                }
+            }
+            return str;
+        }
     }
     public class SymTypeAlias : SymType
     {
@@ -73,17 +119,19 @@ namespace Compiler
         {
             _original = original;
         }
-        public override string ToString()
+        public override string ToString(string prefix)
         {
+            string str;
             string name = GetName();
-            if (name == _original.ToString())
+            if (name != _original.GetName())
             {
-                return name;
-            } 
+                str = $"{GetName()} ({_original.ToString(prefix.Remove(prefix.Length - 5) + ChildrenPrefix(true))})";
+            }
             else
             {
-                return $"{name} ({_original.ToString()})";
+                str = $"{_original.ToString(prefix + ChildrenPrefix(false))}";
             }
+            return str;
         }
     }
 }

@@ -7,7 +7,7 @@
         {
             if (!(Expect(LexemeType.IDENTIFIER)) && !(Expect(LexemeType.WORDKEY)))
             {
-                throw new ExceptionCompiler($"({current_lexeme.NumbLine}, {current_lexeme.NumbSymbol}) expected type variable");
+                throw new ExceptionCompiler($"({current_lexeme.NumbLine}, {current_lexeme.NumbSymbol}) Fatal: expected type variable");
             }
             var type = current_lexeme.LexemeValue;
             if (Expect(LexemeType.IDENTIFIER))
@@ -48,41 +48,42 @@
             return (SymType)symTableStack.Get(a);
         }
 
-        //  array_type ::= "array" "[" (ordinal_type) { "," (ordinal_type) } "]" "of" primitive_type
+        //  array_type ::= "array" "[" (ordinal_array_type) { "," (ordinal_array_type) } "]" "of" primitive_type
         public SymType ParseArrayType()
         {
             SymType type;
             List<OrdinalTypeNode> ordinal_types = new List<OrdinalTypeNode>();
 
-            Require(Separator.OPEN_BRACKET);
+            if (!Expect(Separator.OPEN_BRACKET))
+            {
+                throw new ExceptionCompiler($"({current_lexeme.NumbLine}, {current_lexeme.NumbSymbol}) Fatal: expected '['");
+            }
             do
             {
-                ordinal_types.Add(ParseOrdinalType());
+                GetNextLexeme();
+                ordinal_types.Add(ParseArrayOrdinalType());
             }
             while (Expect(Separator.COMMA));
             Require(Separator.CLOSE_BRACKET);
             Require(KeyWord.OF);
             if (Expect(LexemeType.IDENTIFIER) || Expect(LexemeType.WORDKEY))
             {
-                if (Expect(LexemeType.IDENTIFIER))
-                {
-                    type = ParsePrimitiveType(current_lexeme.LexemeValue.ToString().ToLower());
-                }
-                else
-                {
-                    type = ParsePrimitiveType("string");
-                }
-                if (type == null)
-                {
-                    throw new ExceptionCompiler($"({current_lexeme.NumbLine}, {current_lexeme.NumbSymbol}) expected type");
-                }
+                type = ParseType();
             }
             else
             {
-                throw new ExceptionCompiler($"({current_lexeme.NumbLine}, {current_lexeme.NumbSymbol}) expected type");
+                throw new ExceptionCompiler($"({current_lexeme.NumbLine}, {current_lexeme.NumbSymbol}) Fatal: expected type");
+
             }
-            GetNextLexeme();
             return new SymArray("array", ordinal_types, type);
+        }
+
+        public OrdinalTypeNode ParseArrayOrdinalType()
+        {
+            NodeExpression from = ParseSimpleExpression(inDef: true);
+            Require(Separator.DOUBLE_POINT);
+            NodeExpression to = ParseSimpleExpression(inDef: true);
+            return new OrdinalTypeNode(from, to);
         }
 
         //  ordinal_type ::= simple_expression ".." simple_expression

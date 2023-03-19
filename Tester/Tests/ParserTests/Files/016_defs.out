@@ -1,10 +1,12 @@
 program
 ├─── type
 │    └─── =
-│         ├─── a
-│         └─── integer
+│         ├─── a 
+│         └─── integer 
 ├─── var
 │    └─── a (integer)
 │         └─── b
 ├─── begin
 └─── end
+
+

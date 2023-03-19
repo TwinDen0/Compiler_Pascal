@@ -6,9 +6,9 @@ namespace Compiler
     public class NullStmt : NodeStatement
     {
         public NullStmt() { }
-        public override string ToString(string indent, bool last)
+        public override string ToString(string prefix)
         {
-            return "\r\n";
+            return "";
         }
     }
     public class AssignmentStmt : NodeStatement
@@ -23,12 +23,11 @@ namespace Compiler
             _right = right;
 
         }
-        public override string ToString(string indent, bool last)
+        public override string ToString(string prefix)
         {
-            //string operation = Lexer.convert_sign.Where(x => x.Value == (object)_name).FirstOrDefault().Key;
             return _name + "\r\n" +
-                indent + Prefix(true) + _left.ToString(indent + ChildrenPrefix(true), true) + "\r\n" +
-                indent + Prefix(false) + _right.ToString(indent + ChildrenPrefix(false), false) + "\r\n";
+                prefix + $"├─── {_left.ToString(prefix + ChildrenPrefix(true))}\r\n" +
+                prefix + $"└─── {_right.ToString(prefix + ChildrenPrefix(false))}";
         }
     }
     public class BlockStmt : NodeStatement
@@ -38,20 +37,22 @@ namespace Compiler
         {
             _body = body;
         }
-        public override string ToString(string indent, bool last)
+        public override string ToString(string prefix)
         {
             string str = null;
-            str += indent + Prefix(true) + "begin" + "\r\n";
-            foreach (NodeStatement body in _body)
+            str += prefix + "├─── begin\r\n";
+            foreach (var body in _body)
             {
-                bool prefix = true;
-                if (body == _body.Last())
-                { 
-                    prefix = false;
+                if (body != _body.Last())
+                {
+                    str += prefix + ChildrenPrefix(true) + $"├─── {body.ToString(prefix + ChildrenPrefix(true) + ChildrenPrefix(true))}\r\n";
                 }
-                str += indent + ChildrenPrefix(true) + Prefix(prefix) + body.ToString(indent + ChildrenPrefix(true) + ChildrenPrefix(prefix), true);
+                else
+                {
+                    str += prefix + ChildrenPrefix(true) + $"└─── {body.ToString(prefix + ChildrenPrefix(true) + ChildrenPrefix(false))}\r\n";
+                }
             }
-            str += indent + Prefix(false) + "end" + "\r\n";
+            str += prefix + "└─── end\r\n";
             return str;
         }
     }
@@ -64,13 +65,13 @@ namespace Compiler
             _proc = proc;
             _args = arg;
         }
-        public override string ToString(string indent, bool last)
+        public override string ToString(string prefix)
         {
             string str = null;
             str = $"{_proc.GetName()}";
             if (_args != null && _args.Count > 0)
             {
-                str += $"\r\n";
+                str += "\r\n";
                 int i = 1;
                 foreach (NodeExpression? arg in _args)
                 {
@@ -78,14 +79,14 @@ namespace Compiler
                     {
                         if (arg != null)
                         {
-                            str += indent + Prefix(false) + arg.ToString(indent + ChildrenPrefix(true), true);
+                            str += prefix + $"└─── {arg.ToString(prefix + ChildrenPrefix(true))}";
                         }
                     }
                     else
                     {
                         if (arg != null)
                         {
-                            str += indent + Prefix(true) + arg.ToString(indent + ChildrenPrefix(true), true);
+                            str += prefix + $"├─── {arg.ToString(prefix + ChildrenPrefix(true))}\r\n";
                         }
                         i++;
                     }
@@ -105,14 +106,14 @@ namespace Compiler
             _if_body = if_body;
             _else_body = else_Body;
         }
-        public override string ToString(string indent, bool last)
+        public override string ToString(string prefix)
         {
             string str = null;
             str += "if \r\n";
-            str += indent + Prefix(true) + _condition.ToString(indent + ChildrenPrefix(true), true) + "\r\n";
-            str += indent + Prefix(true) + _if_body.ToString(indent + ChildrenPrefix(true), true) + "\r\n";
-            str += indent + "else\r\n";
-            str += indent + Prefix(false) + _else_body.ToString(indent + ChildrenPrefix(false), true) + "\r\n";
+            str += prefix + $"├─── {_condition.ToString(prefix + ChildrenPrefix(true))}\r\n";
+            str += prefix + $"├─── {_if_body.ToString(prefix + ChildrenPrefix(true))}\r\n";
+            str += prefix + "else\r\n";
+            str += prefix + $"└─── {_else_body.ToString(prefix + ChildrenPrefix(false))}";
             return str;
         }
     }
@@ -131,16 +132,16 @@ namespace Compiler
             _finalval = finalVal;
             _body = body;
         }
-        public override string ToString(string indent, bool last)
+        public override string ToString(string prefix)
         {
             string str = null;
             str += "for \r\n";
-            str += indent + Prefix(true) + ":=\r\n";
-            str += indent + ChildrenPrefix(true) + Prefix(true) + _control_var.ToString(indent + ChildrenPrefix(true), true) + "\r\n";
-            str += indent + ChildrenPrefix(true) + Prefix(false) + _start.ToString(indent + ChildrenPrefix(true), true) + "\r\n";
-            str += indent + Prefix(true) + _keyword.ToString().ToLower() + "\r\n";
-            str += indent + ChildrenPrefix(true) + Prefix(false) + _finalval.ToString(indent + ChildrenPrefix(true), true) + "\r\n";
-            str += indent + Prefix(false) + _body.ToString(indent + ChildrenPrefix(false), true) + "\r\n";
+            str += prefix +  "├─── :=\r\n";
+            str += prefix + ChildrenPrefix(true) + $"├─── {_control_var.ToString(prefix + ChildrenPrefix(true))}\r\n";
+            str += prefix + ChildrenPrefix(true) + $"└─── {_start.ToString(prefix + ChildrenPrefix(true))}\r\n";
+            str += prefix + $"├─── {_keyword.ToString().ToLower()}\r\n";
+            str += prefix + ChildrenPrefix(true) + $"└─── {_finalval.ToString(prefix + ChildrenPrefix(true))}\r\n";
+            str += prefix + $"└─── {_body.ToString(prefix + ChildrenPrefix(false))}";
             return str;
         }
     }
@@ -153,12 +154,12 @@ namespace Compiler
             _condition = condition;
             _body = body;
         }
-        public override string ToString(string indent, bool last)
+        public override string ToString(string prefix)
         {
             string str = null;
             str += "while \r\n";
-            str += indent + Prefix(true) + _condition.ToString(indent + ChildrenPrefix(true), true) + "\r\n";
-            str += indent + Prefix(false) + _body.ToString(indent + ChildrenPrefix(false), true);
+            str += prefix + $"├─── {_condition.ToString(prefix + ChildrenPrefix(true))}\r\n";
+            str += prefix + $"└─── {_body.ToString(prefix + ChildrenPrefix(false))}";
             return str;
         }
     }
@@ -171,7 +172,7 @@ namespace Compiler
             _condition = condition;
             _body = body;
         }
-        public override string ToString(string indent, bool last)
+        public override string ToString(string prefix)
         {
             string str = null;
             str = "repeat\r\n";
@@ -179,13 +180,13 @@ namespace Compiler
             {
                 if (stmt == _body.Last())
                 {
-                    str += indent + Prefix(true) + stmt.ToString(indent + ChildrenPrefix(true), true);
+                    str += prefix + $"├─── {stmt.ToString(prefix + ChildrenPrefix(true))}\r\n";
                 } else
                 {
-                    str += indent + Prefix(true) + stmt.ToString(indent + ChildrenPrefix(true), true) + "\r\n";
+                    str += prefix + $"├─── {stmt.ToString(prefix + ChildrenPrefix(true))}\r\n";
                 }
             }
-            str += indent + Prefix(false) + _condition.ToString(indent + ChildrenPrefix(false), true) + "\r\n";
+            str += prefix + $"└─── {_condition.ToString(prefix + ChildrenPrefix(false))}";
             return str;
         }
     }

@@ -13,11 +13,11 @@
                     case KeyWord.VAR:
                         types.Add(ParseVarDefs());
                         break;
-                    case KeyWord.CONST:
-                        types.Add(ParseConstDefs());
-                        break;
                     case KeyWord.TYPE:
                         types.Add(ParseTypeDefs());
+                        break;
+                    case KeyWord.CONST:
+                        types.Add(ParseConstDefs());
                         break;
                     case KeyWord.PROCEDURE:
                         types.Add(ParseProcedureDefs());
@@ -69,7 +69,7 @@
             {
                 if (names_def.Count > 1)
                 {
-                    throw new ExceptionCompiler($"({current_lexeme.NumbLine}, {current_lexeme.NumbSymbol}) Only one variable can be initialized");
+                    throw new ExceptionCompiler($"({current_lexeme.NumbLine}, {current_lexeme.NumbSymbol}) Fatal : only one variable can be initialized");
                 }
                 GetNextLexeme();
                 value = ParseExpression();
@@ -98,32 +98,29 @@
         }
 
         //  const_declaration ::= "const" one_const_declaration {one_const_declaration}
+        //  one_const_declaration::= id ":" type "=" exp ";"
         public NodeDefs ParseConstDefs()
         {
+            string name;
+
             List<ConstDeclarationNode> body = new List<ConstDeclarationNode>();
             GetNextLexeme();
+
             Require(LexemeType.IDENTIFIER);
             while (Expect(LexemeType.IDENTIFIER))
             {
-                body.Add(ParseConstDef());
+                name = (string)current_lexeme.LexemeValue;
+                symTableStack.Check(name);
+                GetNextLexeme();
+                Require(Operation.EQUAL);
+                NodeExpression value;
+                value = ParseExpression();
+                Require(Separator.SEMICOLON);
+                SymVarConst varConst = new SymVarConst(name, value.GetCachedType(), value);
+                symTableStack.Add(name, varConst);
+                body.Add(new ConstDeclarationNode(varConst, value));
             }
             return new ConstTypesNode(body);
-        }
-
-        //  one_const_declaration::= id ":" type "=" exp ";"
-        public ConstDeclarationNode ParseConstDef()
-        {
-            string name;
-            NodeExpression value;
-
-            name = current_lexeme.LexemeValue.ToString();
-            GetNextLexeme();
-            Require(Operation.EQUAL);
-            value = ParseExpression();
-            Require(Separator.SEMICOLON);
-            SymVarConst varConst = new SymVarConst(name, new SymType("const"));
-            symTableStack.Add(name, varConst);
-            return new ConstDeclarationNode(name, value);
         }
 
         //  type_declaration ::= "type" one_type_declaration {one_type_declaration}
@@ -201,7 +198,7 @@
             BlockStmt body = ParseBlock();
             Require(Separator.SEMICOLON);
 
-            symTableStack.PopBack();////////////////////////////////////////
+            symTableStack.PopBack();
             SymProc symProc = new SymProc(name, params_, locals, body);
             symTableStack.Add(name, symProc);
             return new ProcedureTypesNode(paramsNode, localsTypes, symProc);

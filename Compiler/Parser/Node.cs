@@ -5,19 +5,9 @@ namespace Compiler
 {
     public class Node
     {
-        public virtual string ToString()
-        {
-            return "node";
-        }
-
-        public virtual string ToString(string indent, bool last)
+        public virtual string ToString(string prefix)
         {
             return "";
-        }
-
-        public static string Prefix(bool last)
-        {
-            return last ? "├─── " : "└─── ";
         }
 
         public static string ChildrenPrefix(bool last)
@@ -50,9 +40,9 @@ namespace Compiler
             }
             foreach (NodeDefs type in _types)
             {
-                str += type.ToString(ChildrenPrefix(true), true);
+                str += $"├─── {type.ToString(ChildrenPrefix(true))}";
             }
-            str += _body.ToString(null, true) + "\r\n";
+            str += _body.ToString(null) + "\r\n";
             return str;
         }
     }
