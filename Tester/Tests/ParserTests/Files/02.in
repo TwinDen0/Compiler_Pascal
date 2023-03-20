@@ -1,6 +1,0 @@
-program CheckScalarTypes;
-var
-a : array [0..5, 0..10, 0..12] of integer;
-begin
-a[0, 1, 10] = 5;
-end.

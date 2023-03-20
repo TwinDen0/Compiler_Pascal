@@ -54,9 +54,9 @@ namespace Compiler
             string? opnameStr = _opname.ToString();
             if (_opname.GetType() == typeof(Operation))
             {
-                opnameStr = Lexer.convert_sign.FirstOrDefault(x => x.Value.ToString() == (object)_opname.ToString()).Key;
+                opnameStr = Lexer.convert_sign.FirstOrDefault(x => x.Value.ToString() == _opname.ToString()).Key;
             }
-            if (leftType.GetType() != rightType.GetType() && opnameStr != ".")
+            if (leftType.GetType() != rightType.GetType() && opnameStr != "." && opnameStr != ". ")
             {
                 if ((leftType.GetType().Name == "SymInteger" || leftType.GetType().Name == "SymReal") &&
                    (rightType.GetType().Name == "SymInteger" || rightType.GetType().Name == "SymReal"))

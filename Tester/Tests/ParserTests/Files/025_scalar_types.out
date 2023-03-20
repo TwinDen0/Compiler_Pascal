@@ -1,0 +1,18 @@
+CheckScalarTypes
+├─── type
+├─── var
+│    └─── record 
+│         │    ├─── b
+│         │    │    └─── integer
+│         │    └─── c
+│         │         └─── real
+│         └─── a
+├─── begin
+│    └─── :=
+│         ├─── . 
+│         │    ├─── a
+│         │    └─── b
+│         └─── 5
+└─── end
+
+

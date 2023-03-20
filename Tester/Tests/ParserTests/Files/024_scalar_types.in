@@ -1,0 +1,11 @@
+program CheckScalarTypes;
+type
+rec = record
+a : string;
+b : integer;
+end;
+var
+a : rec;
+begin
+a.b := 10;
+end.

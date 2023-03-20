@@ -23,8 +23,8 @@ namespace Compiler
     {
         static void Main(string[] args)
         {
-            
-               string filePath = "../../../../Tester/Tests/ParserTests/Files/02.in";
+            /*
+               string filePath = "../../../../Tester/Tests/ParserTests/Files/05.in";
 
                var lexer = new Lexer(filePath);
                var parser = new Parser(lexer);
@@ -56,7 +56,7 @@ namespace Compiler
                 }
             }
             /**/
-            /*
+            
             if (args.Length == 0)
                 return;
             try

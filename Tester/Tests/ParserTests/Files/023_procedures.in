@@ -1,7 +1,0 @@
-program Hello;
-const b = 7;
-type t = string;
-var a : t;
-begin
-;
-end.

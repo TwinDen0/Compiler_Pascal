@@ -1,0 +1,10 @@
+program CheckScalarTypes;
+type
+var
+a : record
+ b : integer = 10;
+ c : real = 1.2;
+end;
+begin
+a.b := 5;
+end.

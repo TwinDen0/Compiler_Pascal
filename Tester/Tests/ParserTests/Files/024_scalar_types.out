@@ -1,0 +1,25 @@
+CheckScalarTypes
+├─── type
+│    └─── =
+│         ├─── rec 
+│         └─── record 
+│              ├─── a
+│              │    └─── string
+│              └─── b
+│                   └─── integer 
+├─── var
+│    └─── rec (record 
+│         │    ├─── a
+│         │    │    └─── string
+│         │    └─── b
+│         │         └─── integer)
+│         └─── a
+├─── begin
+│    └─── :=
+│         ├─── . 
+│         │    ├─── a
+│         │    └─── b
+│         └─── 10
+└─── end
+
+

@@ -69,7 +69,7 @@ namespace Compiler
             string str;
             str = $"..\r\n";
             str += prefix + $"├─── {_from.ToString(prefix + ChildrenPrefix(true))}\r\n";
-            str += prefix + $"└─── {_to.ToString(prefix + ChildrenPrefix(true))}";
+            str += prefix + $"└─── {_to.ToString(prefix + ChildrenPrefix(false))}";
             return str;
         }
     }

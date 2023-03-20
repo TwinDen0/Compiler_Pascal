@@ -133,6 +133,7 @@ namespace Compiler
                 {"-=", Operation.SUBTRACRION},
                 {"*=", Operation.MULTIPLICATION},
                 {"/=", Operation.DIVISION},
+                {". ", Operation.POINT_RECORD},
             };
             lineNum = 1;
             symbolNum = 0;
