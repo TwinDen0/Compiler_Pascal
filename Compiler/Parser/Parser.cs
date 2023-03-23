@@ -26,7 +26,6 @@ namespace Compiler
         {
             current_lexeme = _lexer.NextLexeme();
         }
-
         private bool Expect(params object[] requires)
         {
             if (requires[0].GetType() == typeof(LexemeType))
@@ -75,8 +74,6 @@ namespace Compiler
                 GetNextLexeme();
             }
         }
-
-        // mainProgram ::= ['progam' identifier ';'] {declarations} block '.'
         public NodeMainProgram ParseProgram()
         {
             string name_program = null;
@@ -96,8 +93,6 @@ namespace Compiler
             Require(Separator.POINT);
             return new NodeMainProgram(name_program, types, body);
         }
-
-        //  block ::= "begin" [(statement) {";" (statement)}] "end"
         public BlockStmt ParseBlock()
         {
             List<NodeStatement> body = new List<NodeStatement>();
@@ -113,6 +108,94 @@ namespace Compiler
             }
             Require(KeyWord.END);
             return new BlockStmt(body);
+        }
+
+        public string PrintSymTable()
+        {
+            string PrintSymProc(Dictionary<string, Symbol> dic, int index, int depth)
+            {
+                string res = "";
+                SymProc symProc = (SymProc)dic.ElementAt(index).Value;
+                Dictionary<string, Symbol> dicLocals = symProc.GetLocals().GetData();
+                if (dicLocals.Count > 0)
+                {
+                    for (int i = 0; i < depth; i++)
+                    {
+                        res += "\t";
+                    }
+                    res += $"locals of procedure \"{dic.ElementAt(index).Key}\": \r\n";
+                    for (int z = 0; z < dicLocals.Count; z++)
+                    {
+                        for (int i = 0; i < depth; i++)
+                        {
+                            res += "\t";
+                        }
+                        res += dicLocals.ElementAt(z).Key.ToString() + ": " + dicLocals.ElementAt(z).Value.GetType().Name + "\r\n";
+                        if (dicLocals.ElementAt(z).Value.GetType() == typeof(SymProc))
+                        {
+                            res += PrintSymProc(dicLocals, z, depth + 1);
+                        }
+                    }
+                }
+                return res;
+            }
+            string PrintSymRecord(Dictionary<string, Symbol> dic, int index, int depth)
+            {
+                string res = "";
+                SymRecord symRecord = (SymRecord)dic.ElementAt(index).Value;
+                Dictionary<string, Symbol> dicLocals = symRecord.GetFields().GetData();
+                if (dicLocals.Count > 0)
+                {
+                    for (int i = 0; i < depth; i++)
+                    {
+                        res += "\t";
+                    }
+                    res += $"locals of record \"{dic.ElementAt(index).Key}\": \r\n";
+                    for (int z = 0; z < dicLocals.Count; z++)
+                    {
+                        for (int i = 0; i < depth; i++)
+                        {
+                            res += "\t";
+                        }
+                        res += dicLocals.ElementAt(z).Key.ToString() + ": " + dicLocals.ElementAt(z).Value.GetType().Name + "\r\n";
+                        if (dicLocals.ElementAt(z).Value.GetType() == typeof(SymRecord))
+                        {
+                            res += PrintSymRecord(dicLocals, z, depth + 1);
+                        }
+                    }
+                }
+                return res;
+            }
+            string res = "\r\nSymbol Tables:\r\n";
+            for (int i = 0; i < symTableStack.GetCountTables(); i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        res += $"builtins:\r\n";
+                        break;
+                    case 1:
+                        res += $"globals:\r\n";
+                        break;
+                    default:
+                        res += $"table #{i}\r\n";
+                        break;
+                }
+                Dictionary<string, Symbol> dic = symTableStack.GetTable(i).GetData();
+                for (int j = 0; j < dic.Count; j++)
+                {
+                    res += "\t" + dic.ElementAt(j).Key.ToString() + ": " + dic.ElementAt(j).Value.GetType().Name + "\r\n";
+                    if (dic.ElementAt(j).Value.GetType() == typeof(SymProc))
+                    {
+                        res += PrintSymProc(dic, j, 2);
+                    }
+                    if (dic.ElementAt(j).Value.GetType() == typeof(SymRecord))
+                    {
+                        res += PrintSymRecord(dic, j, 2);
+                    }
+                }
+            }
+            return res;
         }
     }
 }

@@ -1,0 +1,26 @@
+program
+├─── var
+│    └─── array
+│         │    ├─── ..
+│         │    │    ├─── 0
+│         │    │    └─── 10
+│         │    └─── integer
+│         └─── a
+├─── begin
+│    └─── :=
+│         ├─── a[1]
+│         └─── "hello"
+└─── end
+
+
+
+Symbol Tables:
+builtins:
+	integer: SymInteger
+	real: SymReal
+	string: SymString
+	write: SymProc
+	read: SymProc
+	exit: SymProc
+globals:
+	a: SymVar

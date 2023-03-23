@@ -83,6 +83,10 @@ namespace Compiler
         {
             return _body;
         }
+        public SymTable GetLocals()
+        {
+            return _locals;
+        }
         public SymProc(string name, SymTable params_, SymTable locals, BlockStmt body) : base(name)
         {
             _params = params_;

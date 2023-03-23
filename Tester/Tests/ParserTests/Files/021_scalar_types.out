@@ -15,7 +15,7 @@ CheckScalarTypes
 │         │    └─── integer)
 │         └─── a
 ├─── begin
-│    └─── =
+│    └─── :=
 │         ├─── a[0]
 │         └─── 5
 └─── end

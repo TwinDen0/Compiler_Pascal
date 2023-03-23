@@ -1,0 +1,25 @@
+program
+├─── var
+│    └─── integer
+│         └─── x
+├─── begin
+│    └─── :=
+│         ├─── x
+│         └─── +
+│              ├─── real
+│              │    └─── 5
+│              └─── 1,1
+└─── end
+
+
+
+Symbol Tables:
+builtins:
+	integer: SymInteger
+	real: SymReal
+	string: SymString
+	write: SymProc
+	read: SymProc
+	exit: SymProc
+globals:
+	x: SymVar

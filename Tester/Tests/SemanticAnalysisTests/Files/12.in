@@ -1,0 +1,5 @@
+var
+x, y : integer;
+begin
+for y := 1 to 'y' do x := 7;
+end.

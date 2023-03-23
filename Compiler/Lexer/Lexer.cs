@@ -44,6 +44,7 @@ namespace Compiler
         private string lastLineFile;
         public int lineNum;
         public int symbolNum;
+        public int symbolStart;
         LexemeType lexemType;
         public string foundLexeme;
         private object lexemeValue;
@@ -136,7 +137,7 @@ namespace Compiler
                 {". ", Operation.POINT_RECORD},
             };
             lineNum = 1;
-            symbolNum = 0;
+            symbolStart = 0;
             foundLexeme = null;
             lexemeValue = null;
             cursor = 0;
@@ -162,17 +163,18 @@ namespace Compiler
                     {
                         currentState = nextStates;
                         foundLexeme += symbol;
-                        symbolNum += 1;
+                        symbolStart += 1;
                     }
 
                     if (nextStates == State.EndToken || i == lastLineFile.Length - 1)
                     {
                         lexemeValue = GetValueLexeme();
 
-                        lastLexeme = new Lexeme(lineNum, cursor + 1, lexemType, lexemeValue, foundLexeme);
+                        symbolNum = cursor + 1;
+                        lastLexeme = new Lexeme(lineNum, symbolNum, lexemType, lexemeValue, foundLexeme);
 
-                        cursor = cursor + symbolNum;
-                        symbolNum = 0;
+                        cursor = cursor + symbolStart;
+                        symbolStart = 0;
                         currentState = State.Start;
                         foundLexeme = null;
                         lexemeReceived = true;
@@ -238,7 +240,7 @@ namespace Compiler
                 }
                 else
                 {
-                    throw new ExceptionCompiler($"({lineNum},{cursor + symbolNum}) Fatal: Unexpected end of file");
+                    throw new ExceptionCompiler($"({lineNum},{cursor + symbolStart}) Fatal: Unexpected end of file");
                 }
             }
 
@@ -258,13 +260,13 @@ namespace Compiler
                 if (foundLexeme?[^1] == '.' && symbolType != SymbolType.Number && symbol != 'e')
                 {
                     foundLexeme = foundLexeme.Remove(foundLexeme.Length - 1, 1);
-                    symbolNum -= 1;
+                    symbolStart -= 1;
                     return State.EndToken;
                 }
                 if (currentState == State.Integer && foundLexeme?[^1] == '.' && symbol == '.')
                 {
                     foundLexeme = foundLexeme.Remove('.');
-                    symbolNum -= 1;
+                    symbolStart -= 1;
                     return State.EndToken;
                 }
 
@@ -285,7 +287,7 @@ namespace Compiler
                 pair = foundLexeme + symbol.ToString();
                 if (pair_operations.Any(sm => sm == pair))
                 {
-                    symbolNum += 1;
+                    symbolStart += 1;
                     foundLexeme += symbol.ToString();
                     currentState = State.Operator;
                     return State.EndToken;
@@ -319,11 +321,11 @@ namespace Compiler
             {
                 if(currentState == State.Start)
                 {
-                    throw new ExceptionCompiler($"({lineNum},{cursor + symbolNum + 1}) Fatal: illegal character \"'}}'\"");
+                    throw new ExceptionCompiler($"({lineNum},{cursor + symbolStart + 1}) Fatal: illegal character \"'}}'\"");
                 }
                 else
                 {
-                    throw new ExceptionCompiler($"({lineNum},{cursor + symbolNum + 1}) Fatal: Lexical error, for {currentState} not expected \"{symbol}\"");
+                    throw new ExceptionCompiler($"({lineNum},{cursor + symbolStart + 1}) Fatal: Lexical error, for {currentState} not expected \"{symbol}\"");
                 }
             }
 
@@ -332,7 +334,7 @@ namespace Compiler
         public void GetReal() 
         {
             foundLexeme = null;
-            symbolNum = 0;
+            symbolStart = 0;
             var point_found = false;
             var e_found = false;
 
@@ -342,7 +344,7 @@ namespace Compiler
                 if (Char.IsDigit(symbol))
                 {
                     foundLexeme += symbol;
-                    symbolNum += 1;
+                    symbolStart += 1;
                     continue;
                 }
                 if (symbol == '.')
@@ -350,7 +352,7 @@ namespace Compiler
                     if (!point_found)
                     {
                         foundLexeme += symbol;
-                        symbolNum += 1;
+                        symbolStart += 1;
                         point_found = true;
                         continue;
                     }
@@ -364,14 +366,14 @@ namespace Compiler
                     if (!e_found)
                     {
                         foundLexeme += symbol;
-                        symbolNum += 1;
+                        symbolStart += 1;
                         e_found = true;
                         point_found = true;
                         continue;
                     }
                     else
                     {
-                        throw new ExceptionCompiler($"({lineNum},{cursor + symbolNum + 1}) Fatal: Lexical error, real cannot contain \"e\" more than once");
+                        throw new ExceptionCompiler($"({lineNum},{cursor + symbolStart + 1}) Fatal: Lexical error, real cannot contain \"e\" more than once");
                     }
                 }
                 if (symbol == '+' || symbol == '-')
@@ -379,14 +381,14 @@ namespace Compiler
                     if (foundLexeme[^1] == 'e') 
                     {
                         foundLexeme += symbol;
-                        symbolNum += 1;
+                        symbolStart += 1;
                         continue;
                     }
                     else
                     {
                         if(foundLexeme[^1] == '-' || foundLexeme[^1] == '+')
                         {
-                            throw new ExceptionCompiler($"({lineNum},{cursor + symbolNum + 1}) Fatal: Lexical error, expected \"e\" but found \"{symbol}\"");
+                            throw new ExceptionCompiler($"({lineNum},{cursor + symbolStart + 1}) Fatal: Lexical error, expected \"e\" but found \"{symbol}\"");
                         }
                         else
                         {
@@ -399,17 +401,17 @@ namespace Compiler
                     break;
                 }
 
-                throw new ExceptionCompiler($"({lineNum},{cursor + symbolNum + 1}) Fatal: Lexical error, expected number");
+                throw new ExceptionCompiler($"({lineNum},{cursor + symbolStart + 1}) Fatal: Lexical error, expected number");
             }
 
             if (foundLexeme[^1] == 'e')
             {
-                throw new ExceptionCompiler($"({lineNum},{cursor + symbolNum + 1}) Fatal: Lexical error, real cannot end with \"e\", after \"e\" you should specify a number");
+                throw new ExceptionCompiler($"({lineNum},{cursor + symbolStart + 1}) Fatal: Lexical error, real cannot end with \"e\", after \"e\" you should specify a number");
             }
         }
         public void GetString()
         {
-            symbolNum = 0;
+            symbolStart = 0;
             var start_string = false;
             var start_char = false;
             for (int j = cursor; j < lastLineFile.Length; j++)
@@ -423,17 +425,17 @@ namespace Compiler
                     {
                         if (j >= lastLineFile.Length - 1)
                         {
-                            throw new ExceptionCompiler($"({lineNum},{cursor + symbolNum + 2}) Fatal: Lexical error, \"'\" expected");
+                            throw new ExceptionCompiler($"({lineNum},{cursor + symbolStart + 2}) Fatal: Lexical error, \"'\" expected");
                         }
 
                         start_string = true;
-                        symbolNum += 1;
+                        symbolStart += 1;
                         continue;
                     }
                     else
                     {
                         start_string = false;
-                        symbolNum += 1;
+                        symbolStart += 1;
                         continue;
                     }
 
@@ -442,7 +444,7 @@ namespace Compiler
                 {
                     foundLexeme += lastLineFile[j];
                     start_char = true;
-                    symbolNum += 1;
+                    symbolStart += 1;
                     continue;
                 }
                 if (start_char)
@@ -450,7 +452,7 @@ namespace Compiler
                     if (Char.IsDigit(lastLineFile[j]))
                     {
                         foundLexeme += lastLineFile[j];
-                        symbolNum += 1;
+                        symbolStart += 1;
                         continue;
                     }
                     if (separators.Any(sm => sm == lastLineFile[j]) || operations.Any(sm => sm == lastLineFile[j]) || lastLineFile[j] == ' ')
@@ -459,13 +461,13 @@ namespace Compiler
                     }
                     else
                     {
-                        throw new ExceptionCompiler($"({lineNum},{cursor + symbolNum + 1}) Fatal: Lexical error, expected number");
+                        throw new ExceptionCompiler($"({lineNum},{cursor + symbolStart + 1}) Fatal: Lexical error, expected number");
                     }
                 }
                 if (start_string)
                 {
                     foundLexeme += lastLineFile[j];
-                    symbolNum += 1;
+                    symbolStart += 1;
                 }
                 else
                 {
@@ -475,14 +477,14 @@ namespace Compiler
                     }
                     else
                     {
-                        throw new ExceptionCompiler($"({lineNum},{cursor + symbolNum + 1}) Fatal: Lexical error, missing separator or operations");
+                        throw new ExceptionCompiler($"({lineNum},{cursor + symbolStart + 1}) Fatal: Lexical error, missing separator or operations");
                     }
                 }
             }
 
             if (start_string)
             {
-                throw new ExceptionCompiler($"({lineNum},{cursor + symbolNum + 1}) Fatal: Lexical error, \"'\" expected");
+                throw new ExceptionCompiler($"({lineNum},{cursor + symbolStart + 1}) Fatal: Lexical error, \"'\" expected");
             }
 
         }
@@ -620,7 +622,7 @@ namespace Compiler
                     {
                         throw new ExceptionCompiler($"({lineNum},{cursor + 1}) Fatal: Incorrect lexeme");
                     }
-                    symbolNum += 1;
+                    symbolStart += 1;
                     for (int i = 1; i < foundLexemeUp.Length; i++)
                     {
                         int number = 0;
@@ -648,7 +650,7 @@ namespace Compiler
                         if (number < numsystem)
                         {
                             valueLexeme = (valueLexeme * numsystem) + number;
-                            symbolNum += 1;
+                            symbolStart += 1;
                         }
                         else
                         {
@@ -670,7 +672,7 @@ namespace Compiler
                 {
                     currentState = State.Real;
                     this.foundLexeme += '0';
-                    symbolNum += 1;
+                    symbolStart += 1;
                 }
                 else
                 {
@@ -718,7 +720,7 @@ namespace Compiler
         {
             lastLineFile = reader.ReadLine();
 
-            symbolNum = 0;
+            symbolStart = 0;
             cursor = 0;
             lineNum += 1;
 

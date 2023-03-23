@@ -1,0 +1,9 @@
+var
+x : integer;
+procedure y (x : string);
+var
+x : integer;
+begin
+end;
+begin
+end.

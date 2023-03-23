@@ -1,0 +1,5 @@
+var
+x : integer;
+x : string;
+begin
+end.

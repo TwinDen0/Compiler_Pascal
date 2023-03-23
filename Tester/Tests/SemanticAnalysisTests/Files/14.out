@@ -1,0 +1,27 @@
+program
+├─── procedure x
+│    ├─── parameters
+│    │    └─── integer
+│    │         └─── y
+│    ├─── local_types
+│    ├─── begin
+│    └─── end
+├─── begin
+│    └─── x
+│         └─── "hi"
+└─── end
+
+
+
+Symbol Tables:
+builtins:
+	integer: SymInteger
+	real: SymReal
+	string: SymString
+	write: SymProc
+	read: SymProc
+	exit: SymProc
+globals:
+	x: SymProc
+		locals of procedure "x": 
+		y: SymVar

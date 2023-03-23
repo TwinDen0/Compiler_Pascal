@@ -1,0 +1,5 @@
+var
+x : real;
+begin
+x := 5 + 1.1;
+end.

@@ -2,7 +2,6 @@
 {
     public partial class Parser
     {
-        //  type ::= primitive_type | array_type | record_type | original_type
         public SymType ParseType()
         {
             if (!(Expect(LexemeType.IDENTIFIER)) && !(Expect(LexemeType.WORDKEY)))
@@ -41,14 +40,10 @@
                     return new SymTypeAlias((string)type, original_type);
             }
         }
-
-        // primitive_type::= "integer" | "real" | "string" 
         public SymType ParsePrimitiveType(string a)
         {
             return (SymType)symTableStack.Get(a);
         }
-
-        //  array_type ::= "array" "[" (ordinal_array_type) { "," (ordinal_array_type) } "]" "of" primitive_type
         public SymType ParseArrayType()
         {
             SymType type;
@@ -77,7 +72,6 @@
             }
             return new SymArray("array", ordinal_types, type);
         }
-
         public OrdinalTypeNode ParseArrayOrdinalType()
         {
             NodeExpression from = ParseSimpleExpression(inDef: true);
@@ -85,8 +79,6 @@
             NodeExpression to = ParseSimpleExpression(inDef: true);
             return new OrdinalTypeNode(from, to);
         }
-
-        //  ordinal_type ::= simple_expression ".." simple_expression
         public OrdinalTypeNode ParseOrdinalType()
         {
             NodeExpression from = ParseSimpleExpression();
@@ -94,8 +86,6 @@
             NodeExpression to = ParseSimpleExpression();
             return new OrdinalTypeNode(from, to);
         }
-
-        //  record_type ::=  "record" {one_var_declaration} "end"
         public SymType ParseRecordType()
         {
             SymTable fields = new SymTable(new Dictionary<string, Symbol>());

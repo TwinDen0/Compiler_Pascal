@@ -1,0 +1,5 @@
+var
+x : integer;
+begin
+x := 1 + (5 5) + 3;
+end.

@@ -1,0 +1,5 @@
+var
+a : array[0..10] of integer;
+begin
+a[1] := 'hello';
+end.

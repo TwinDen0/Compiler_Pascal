@@ -1,8 +1,9 @@
-﻿namespace Compiler
+﻿using System.Security.AccessControl;
+
+namespace Compiler
 {
     public partial class Parser
     {
-        //  declarations ::= var_declaration | const_declaration | type_declaration | procedure_declaration
         public List<NodeDefs> ParseDefs()
         {
             List<NodeDefs> types = new List<NodeDefs>();
@@ -26,8 +27,6 @@
             }
             return types;
         }
-
-        // var_declaration ::= "var" one_var_declaration {one_var_declaration}
         public NodeDefs ParseVarDefs()
         {
             List<VarDeclarationNode> body = new List<VarDeclarationNode>();
@@ -40,8 +39,6 @@
             }
             return new VarTypesNode(body);
         }
-
-        //  one_var_declaration ::= id {"," id} ":" type ";" | id ":" type "=" exp ";"
         public VarDeclarationNode ParseVarDef(KeyWord? param = null)
         {
             List<string> names_def = new List<string>();
@@ -51,12 +48,14 @@
 
             Require(LexemeType.IDENTIFIER);
             names_def.Add(current_lexeme.LexemeValue.ToString());
+            symTableStack.Check(names_def[^1]);
             GetNextLexeme();
             while (Expect(Separator.COMMA))
             {
                 GetNextLexeme();
                 Require(LexemeType.IDENTIFIER);
                 names_def.Add(current_lexeme.LexemeValue.ToString());
+                symTableStack.Check(names_def[^1]);
                 GetNextLexeme();
             }
             Require(Operation.COLON);
@@ -96,9 +95,6 @@
             }
             return new VarDeclarationNode(vars, type, value);
         }
-
-        //  const_declaration ::= "const" one_const_declaration {one_const_declaration}
-        //  one_const_declaration::= id ":" type "=" exp ";"
         public NodeDefs ParseConstDefs()
         {
             string name;
@@ -122,8 +118,6 @@
             }
             return new ConstTypesNode(body);
         }
-
-        //  type_declaration ::= "type" one_type_declaration {one_type_declaration}
         public NodeDefs ParseTypeDefs()
         {
             List<DeclarationNode> body = new List<DeclarationNode>();
@@ -135,8 +129,6 @@
             }
             return new TypeTypesNode(body);
         }
-
-        //  one_type_declaration ::= id "=" type
         public TypeDeclarationNode ParseTypeDef()
         {
             string nameType;
@@ -144,6 +136,7 @@
 
             Require(LexemeType.IDENTIFIER);
             nameType = current_lexeme.LexemeValue.ToString();
+            symTableStack.Check(nameType);
             GetNextLexeme();
             Require(Operation.EQUAL);
             type = ParseType();
@@ -151,17 +144,15 @@
             symTableStack.Add(nameType, type);
             return new TypeDeclarationNode(nameType, typeAlias);
         }
-
-        //  procedure_declaration ::= "procedure" identifier [procedure_parameters] ";" {var_declaration | const_declaration | type_declaration} block ";"
         public NodeDefs ParseProcedureDefs()
         {
             string name;
             List<VarDeclarationNode> paramsNode = new List<VarDeclarationNode>();
             SymTable locals = new SymTable(new Dictionary<string, Symbol>());
-
             GetNextLexeme();
             Require(LexemeType.IDENTIFIER);
             name = current_lexeme.LexemeValue.ToString();
+            symTableStack.Check(name);
             GetNextLexeme();
             symTableStack.AddTable(locals);
             if (Expect(Separator.OPEN_PARENTHESIS))
@@ -170,8 +161,6 @@
                 Require(Separator.CLOSE_PARENTHESIS);
             }
             Require(Separator.SEMICOLON);
-
-            //var defs
 
             SymTable params_ = new SymTable(symTableStack.GetBackTable());
 
@@ -203,8 +192,6 @@
             symTableStack.Add(name, symProc);
             return new ProcedureTypesNode(paramsNode, localsTypes, symProc);
         }
-
-        //  procedure_parameters ::= "(" ["var"|"out"] <one_var_declaration> {";" ["var"|"out"] <one_var_declaration>} ")"
         public List<VarDeclarationNode> ParseProcedureParameters()
         {
             List<VarDeclarationNode> paramsNode = new List<VarDeclarationNode>();

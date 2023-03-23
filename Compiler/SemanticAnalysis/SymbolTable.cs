@@ -48,6 +48,14 @@
     public class SymTableStack
     {
         List<SymTable> tables;
+        public int GetCountTables()
+        {
+            return tables.Count;
+        }
+        public SymTable GetTable(int index)
+        {
+            return tables[index];
+        }
         public SymTable GetBackTable()
         {
             return tables[^1];
@@ -75,7 +83,7 @@
             }
             catch
             {
-                throw new Exception($"Duplicate identifier \"{name}\"");
+                throw new Exception($"Duplicate identifier \"{name.ToString()}\"");
             }
         }
         public Symbol Get(string name)

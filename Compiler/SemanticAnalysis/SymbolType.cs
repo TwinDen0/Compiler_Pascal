@@ -125,7 +125,7 @@ namespace Compiler
             string name = GetName();
             if (name != _original.GetName())
             {
-                str = $"{GetName()} ({_original.ToString(prefix.Remove(prefix.Length - 5) + ChildrenPrefix(true))})";
+                str = $"{name} ({_original.ToString(prefix.Remove(prefix.Length - 5) + ChildrenPrefix(true))})";
             }
             else
             {

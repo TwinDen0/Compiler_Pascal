@@ -2,7 +2,6 @@
 {
     public partial class Parser
     {
-        //  expression ::= simple_expression ("<" | "<=" | ">" | ">=" | "=" | "<>") simple_expression
         public NodeExpression ParseExpression(bool inDef = false)
         {
             NodeExpression left = ParseSimpleExpression(inDef);
@@ -15,8 +14,6 @@
             }
             return left;
         }
-
-        //  simple_expression ::= term { ("or" | "+" | "-") term }
         public NodeExpression ParseSimpleExpression(bool inDef = false)
         {
             NodeExpression left = ParseTerm(inDef);
@@ -24,13 +21,11 @@
             {
                 object operation = current_lexeme.LexemeValue;
                 GetNextLexeme();
-                NodeExpression right = ParseSimpleExpression(inDef);
+                NodeExpression right = ParseTerm(inDef);
                 left = new NodeBinOp(operation, left, right);
             }
             return left;
         }
-
-        //  term ::= factor { ( "and" | "/" | "*" ) factor } 
         public NodeExpression ParseTerm(bool inDef = false)
         {
             NodeExpression left = ParseFactor(inDef);
@@ -43,8 +38,6 @@
             }
             return left;
         }
-
-        //  factor ::= ( string | ["+" | "-"] ( int | real) | call |  variable | "(" expression ")"| id "." id)
         public NodeExpression ParseFactor(bool inDef = false)
         {
             if (Expect(LexemeType.STRING))
@@ -85,7 +78,7 @@
                 }
                 catch
                 {
-                    throw new ExceptionCompiler($"{current_lexeme.NumbLine}, {current_lexeme.NumbSymbol}) Identifier not found \"{factor.LexemeValue}\"");
+                    throw new ExceptionCompiler($"({current_lexeme.NumbLine}, {current_lexeme.NumbSymbol}) Fatal: Identifier not found {factor.LexemeValue}");
                 }
                 if (inDef && symVar.GetType() != typeof(SymVarConst))
                 {

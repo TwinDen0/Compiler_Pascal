@@ -24,37 +24,28 @@ namespace Compiler
         static void Main(string[] args)
         {
             /*
-               string filePath = "../../../../Tester/Tests/ParserTests/Files/05.in";
+             string filePath = "../../../../Tester/Tests/SemanticAnalysisTests/Files/15.in";
 
-               var lexer = new Lexer(filePath);
-               var parser = new Parser(lexer);
+                    var lexer = new Lexer(filePath);
 
-               var node_main = parser.ParseProgram();
-
-               parser.PrintParse(node_main);
-               /**/
-
-            /*
-            bool endfile = false;
-            while (!endfile)
+            try
             {
-                Lexeme currectlexeme = lexer.NextLexeme();
+                var parser = new Parser(lexer);
 
-                if (currectlexeme.LexemeType == LexemeType.ENDFILE)
-                {
-                    endfile = true;
-                    break;
-                }
-                if (currectlexeme.LexemeType == LexemeType.SEPARATOR || currectlexeme.LexemeType == LexemeType.OPERATOR)
-                {
-                    //string k = convert_sign.Where(x => x.Value == (object)Separator.CLOSE_BRACKET).FirstOrDefault().Key;
-                    Console.WriteLine($"{currectlexeme.NumbLine}\t{currectlexeme.NumbSymbol}\t{currectlexeme.LexemeType}\t{currectlexeme.LexemeSource}\t{currectlexeme.LexemeSource}");
-                }
-                else
-                {
-                    Console.WriteLine($"{currectlexeme.NumbLine}\t{currectlexeme.NumbSymbol}\t{currectlexeme.LexemeType}\t{currectlexeme.LexemeValue}\t{currectlexeme.LexemeSource}");
-                }
+                var node_main = parser.ParseProgram();
+
+                parser.PrintParse(node_main);
+                Console.Write(parser.PrintSymTable());
             }
+            catch (ExceptionCompiler e)
+            {
+                Console.Write(e);
+            }
+            catch (Exception e)
+            {
+                Console.Write($"({lexer.lineNum},{lexer.symbolNum}) Fatal: {e.Message}");
+            }
+
             /**/
             
             if (args.Length == 0)
@@ -86,7 +77,7 @@ namespace Compiler
                         }
                     }
                 }
-            if (args.Contains("-parser"))
+                if (args.Contains("-parser"))
                 {
                     var lexer = new Lexer(args[0]);
                     var parser = new Parser(lexer);
@@ -94,6 +85,27 @@ namespace Compiler
                     var node_main = parser.ParseProgram();
 
                     parser.PrintParse(node_main);
+                }
+                if (args.Contains("-semantic"))
+                {
+                    var lexer = new Lexer(args[0]);
+
+                    try
+                    {
+                        var parser = new Parser(lexer);
+                        var node_main = parser.ParseProgram();
+
+                        parser.PrintParse(node_main);
+                        Console.Write(parser.PrintSymTable());
+                    }
+                    catch (ExceptionCompiler e)
+                    {
+                        Console.Write(e);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.Write($"({lexer.lineNum},{lexer.symbolNum}) Fatal: {e.Message}");
+                    }
                 }
             }
             catch (ExceptionCompiler e)

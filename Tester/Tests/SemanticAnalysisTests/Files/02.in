@@ -1,0 +1,6 @@
+var
+a : string;
+b : integer;
+c,a : real;
+begin
+end.

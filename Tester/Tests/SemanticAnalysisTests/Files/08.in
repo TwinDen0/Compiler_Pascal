@@ -1,0 +1,5 @@
+type
+x = integer;
+x = string;
+begin
+end.

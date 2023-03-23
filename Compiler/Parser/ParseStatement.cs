@@ -5,7 +5,6 @@ namespace Compiler
 {
     public partial class Parser
     {
-        // statement ::= simple_stmt | struct_stmt
         public NodeStatement ParseStatement()
         {
             NodeStatement res = new NullStmt();
@@ -17,8 +16,6 @@ namespace Compiler
             res = ParseStructStmt();
             return res;
         }
-
-        // simple_stmt ::= "exit" | call | assignment
         public NodeStatement ParseSimpleStmt()
         {
             if (Expect(KeyWord.EXIT))
@@ -38,8 +35,6 @@ namespace Compiler
                 return ParseAssignmentStmt(id);
             }
         }
-
-        // call ::= id "(" [simple_factor { "," simple_factor }] ")"
         public CallStmt ParseCallStmt(Lexeme id)
         {
             List<NodeExpression?> parameter = new List<NodeExpression?>();
@@ -64,8 +59,6 @@ namespace Compiler
             }
             return new CallStmt(proc, parameter);
         }
-
-        // assignment ::= id {":=" | "+=" | "-=" | "*=" | "/="} (expression | string)
         public AssignmentStmt ParseAssignmentStmt(Lexeme id)
         {
             string operation;
@@ -85,13 +78,15 @@ namespace Compiler
                     left = ParseRecordElement(left, ref symVar);
                     break;
             }
+            if (!Expect(Operation.ASSIGNMENT, Operation.ADDITION, Operation.SUBTRACRION, Operation.MULTIPLICATION, Operation.DIVISION))
+            {
+                throw new ExceptionCompiler($"({current_lexeme.NumbSymbol}, {current_lexeme.NumbLine}) Fatal: Expected assigment sign");
+            }
             operation = current_lexeme.LexemeSource;
             GetNextLexeme();
             right = ParseExpression();
             return new AssignmentStmt(operation, left, right);
         }
-
-        //  array_element ::= id "[" simple_expression "]"
         public NodeExpression ParseArrayElement(NodeExpression node, ref SymVar var_)
         {
             SymArray array = new SymArray("", new List<OrdinalTypeNode>(), new SymInteger(""));
@@ -138,8 +133,6 @@ namespace Compiler
             }
             return new NodeArrayElement(var_.GetName(), array, body);
         }
-
-        //  record_element ::= id "." id
         public NodeExpression ParseRecordElement(NodeExpression node, ref SymVar var_)
         {
             GetNextLexeme();
@@ -154,8 +147,6 @@ namespace Compiler
             GetNextLexeme();
             return new NodeRecordAccess(Operation.POINT_RECORD, node, field);
         }
-
-        //  structStmt ::=  if | for | while | repeat | block
         public NodeStatement ParseStructStmt()
         {
             NodeStatement res = new NullStmt();
@@ -183,8 +174,6 @@ namespace Compiler
             }
             return res;
         }
-
-        //  if ::= "if" expression "then" statement["else" statement]
         public NodeStatement ParseIf()
         {
             NodeExpression condition;
@@ -205,8 +194,6 @@ namespace Compiler
             }
             return new IfStmt(condition, if_body, else_body);
         }
-
-        //  for ::= "for" id ":=" simple_expression "to" simple_expression "do" statement
         public NodeStatement ParseFor()
         {
             KeyWord to_downto;
@@ -217,6 +204,10 @@ namespace Compiler
             GetNextLexeme();
             Require(LexemeType.IDENTIFIER);
             control_var = new NodeVar((SymVar)symTableStack.Get((string)current_lexeme.LexemeValue));
+            if (control_var.CalcType().GetType() != typeof(SymInteger))
+            {
+                throw new Exception($"Ordinal expression expected");
+            }
             GetNextLexeme();
             Require(Operation.ASSIGNMENT);
             start = ParseSimpleExpression();
@@ -224,15 +215,21 @@ namespace Compiler
             {
                 throw new ExceptionCompiler($"({current_lexeme.NumbLine}, {current_lexeme.NumbSymbol}) expected 'to' or 'downto'");
             }
+            if (!Expect(KeyWord.TO, KeyWord.DOWNTO))
+            {
+                throw new Exception("expected 'to' or 'downto'");
+            }
             to_downto = (KeyWord)current_lexeme.LexemeValue;
             GetNextLexeme();
             final_value = ParseSimpleExpression();
+            if (final_value.CalcType().GetType() != control_var.GetCachedType().GetType())
+            {
+                throw new Exception($"Incompatible types");
+            }
             Require(KeyWord.DO);
             body = ParseStatement();
             return new ForStmt(control_var, start, to_downto, final_value, body);
         }
-
-        //  while ::= "while" expression "do" statement
         public NodeStatement ParseWhile()
         {
             NodeExpression condition;
@@ -244,8 +241,6 @@ namespace Compiler
             body = ParseStatement();
             return new WhileStmt(condition, body);
         }
-
-        //  repeat ::= "repeat" { statement ";"} "until" expression
         public NodeStatement ParseRepeat()
         {
             NodeExpression condition;

@@ -77,7 +77,7 @@ namespace Compiler
                 }
                 else
                 {
-                    throw new Exception($"Incompatible types {_opname.GetType()}");
+                    throw new Exception($"Incompatible types ");
                 }
             }
             if ((leftType.GetType().Name == "SymString" && rightType.GetType().Name == "SymString" && (opnameStr == "/" || opnameStr == "*" || opnameStr == "-")) ||

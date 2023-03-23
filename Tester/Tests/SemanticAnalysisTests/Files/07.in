@@ -1,0 +1,5 @@
+var
+x : integer = 10;
+x : string = "Hello!";
+begin
+end.

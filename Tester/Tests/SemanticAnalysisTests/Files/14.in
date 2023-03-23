@@ -1,0 +1,7 @@
+procedure x (y : integer);
+begin
+
+end;
+begin
+x('hi');
+end.

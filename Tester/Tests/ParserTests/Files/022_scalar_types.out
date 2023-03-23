@@ -13,7 +13,7 @@ CheckScalarTypes
 │         │    └─── integer
 │         └─── a
 ├─── begin
-│    └─── =
+│    └─── :=
 │         ├─── a[0, 1, 10]
 │         └─── 5
 └─── end
