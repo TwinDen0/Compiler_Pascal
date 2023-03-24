@@ -9,30 +9,30 @@ namespace Compiler
 {
     public class Symbol : Node
     {
-        string name;
+        string _name;
         public Symbol(string name)
         {
-            this.name = name;
+            _name = name;
         }
         public string GetName()
         {
-            return name;
+            return _name;
         }
         public override string ToString(string prefix)
         {
-            return name;
+            return _name;
         }
     }
     public class SymVar : Symbol
     {
-        SymType type;
+        SymType _type;
         public SymType GetTypeVar()
         {
-            return type;
+            return _type;
         }
         public SymType GetOriginalTypeVar()
         {
-            SymType buildsType = type;
+            SymType buildsType = _type;
             while (buildsType.GetType().Name == "SymTypeAlias")
             {
                 SymTypeAlias symTypeAlias = (SymTypeAlias)buildsType;
@@ -42,15 +42,15 @@ namespace Compiler
         }
         public SymVar(string name, SymType type) : base(name)
         {
-            this.type = type;
+            _type = type;
         }
     }
     public class SymVarConst : SymVar
     {
-        public NodeExpression value;
+        public NodeExpression _value;
         public SymVarConst(string name, SymType type, NodeExpression value) : base(name, type)
         {
-            this.value = value;
+            _value = value;
         }
 
     }
@@ -64,13 +64,13 @@ namespace Compiler
     }
     public class SymProc : Symbol
     {
-        bool unlimitedParameters = false;
+        bool _standart_proc = false;
         SymTable _params;
         SymTable _locals;
         BlockStmt _body;
         public int GetCountParams()
         {
-            if (unlimitedParameters)
+            if (_standart_proc)
             {
                 return -1;
             }
@@ -95,7 +95,7 @@ namespace Compiler
         }
         public SymProc(string name) : base(name)
         {
-            unlimitedParameters = true;
+            _standart_proc = true;
             _params = new SymTable(new Dictionary<string, Symbol>());
             _locals = new SymTable(new Dictionary<string, Symbol>());
             _body = new BlockStmt(new List<NodeStatement>());

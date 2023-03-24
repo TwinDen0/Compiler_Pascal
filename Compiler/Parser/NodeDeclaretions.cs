@@ -5,6 +5,8 @@ using System.Xml.Linq;
 namespace Compiler
 {
     public class NodeDefs : Node { }
+    public class DeclarationNode : Node { }
+
     public class VarTypesNode : NodeDefs
     {
         List<VarDeclarationNode> _body;
@@ -30,6 +32,52 @@ namespace Compiler
             return str;
         }
     }
+    public class VarDeclarationNode : DeclarationNode
+    {
+        List<SymVar> _vars_name;
+        SymType _type;
+        NodeExpression? _value = null;
+        public VarDeclarationNode(List<SymVar> name, SymType type, NodeExpression? value)
+        {
+            _vars_name = name;
+            _type = type;
+            _value = value;
+        }
+        public List<SymVar> GetVars()
+        {
+            return _vars_name;
+        }
+        public NodeExpression? GetValue()
+        {
+            return _value;
+        }
+        public override string ToString(string prefix)
+        {
+            string str = _type.ToString(prefix + ChildrenPrefix(true)) + "\r\n";
+            if (_value == null)
+            {
+                foreach (SymVar name in _vars_name)
+                {
+                    if (name != _vars_name.Last())
+                    {
+                        str += prefix + $"├─── {name.GetName()}\r\n";
+                    }
+                    else
+                    {
+                        str += prefix + $"└─── {name.GetName()}\r\n";
+                    }
+                }
+            }
+            else
+            {
+                str += prefix + $"├─── {_vars_name[0].GetName()}\r\n" +
+                       prefix + "└─── =\r\n" +
+                       prefix + $"     └─── {_value.ToString(prefix + ChildrenPrefix(false))}\r\n";
+            }
+            return str;
+        }
+    }
+
     public class ConstTypesNode : NodeDefs
     {
         List<ConstDeclarationNode> _body;
@@ -55,6 +103,29 @@ namespace Compiler
             return str;
         }
     }
+    public class ConstDeclarationNode : DeclarationNode
+    {
+        SymVarConst _var;
+        NodeExpression _value;
+        public ConstDeclarationNode(SymVarConst var, NodeExpression value)
+        {
+            this._var = var;
+            this._value = value;
+            if ((value.GetCachedType().GetType() != typeof(SymInteger)) &&
+                (value.GetCachedType().GetType() != typeof(SymReal)) &&
+                (value.GetCachedType().GetType() != typeof(SymString)))
+            {
+                throw new Exception($"Incompatible types");
+            }
+        }
+        public override string ToString(string prefix)
+        {
+            return "=" + "\r\n" +
+                prefix + $"├─── {_var.GetName()} \r\n" +
+                prefix + $"└─── {_value.ToString(prefix + ChildrenPrefix(false))} \r\n";
+        }
+    }
+
     public class TypeTypesNode : NodeDefs
     {
         List<DeclarationNode> _body;
@@ -80,6 +151,23 @@ namespace Compiler
             return str;
         }
     }
+    public class TypeDeclarationNode : DeclarationNode
+    {
+        string _name;
+        SymTypeAlias _type;
+        public TypeDeclarationNode(string name, SymTypeAlias type)
+        {
+            _name = name;
+            _type = type;
+        }
+        public override string ToString(string prefix)
+        {
+            return "=" + "\r\n" +
+                prefix + $"├─── {_name.ToString()} \r\n" +
+                prefix + $"└─── {_type.ToString(prefix)} \r\n";
+        }
+    }
+
     public class ProcedureTypesNode : NodeDefs
     {
         List<VarDeclarationNode> _params;
@@ -121,91 +209,6 @@ namespace Compiler
             }
             str += _symProc.GetBody().ToString(prefix);
             return str;
-        }
-    }
-
-    public class DeclarationNode : Node { }
-    public class VarDeclarationNode : DeclarationNode
-    {
-        List<SymVar> _vars_name;
-        SymType _type;
-        NodeExpression? _value = null;
-        public VarDeclarationNode(List<SymVar> name, SymType type, NodeExpression? value)
-        {
-            _vars_name = name;
-            _type = type;
-            _value = value;
-        }
-        public List<SymVar> GetVars()
-        {
-            return _vars_name;
-        }
-        public NodeExpression? GetValue()
-        {
-            return _value;
-        }
-        public override string ToString(string prefix)
-        {
-            string str = _type.ToString(prefix + ChildrenPrefix(true)) + "\r\n";
-            if (_value == null)
-            {
-                foreach (SymVar name in _vars_name)
-                {
-                    if (name != _vars_name.Last())
-                    {
-                        str += prefix + $"├─── {name.GetName()}\r\n";
-                    }
-                    else
-                    {
-                        str += prefix + $"└─── {name.GetName()}\r\n";
-                    }
-                }
-            } 
-            else
-            {
-                str += prefix + $"├─── {_vars_name[0].GetName()}\r\n" +
-                       prefix +  "└─── =\r\n" +
-                       prefix + $"     └─── { _value.ToString(prefix + ChildrenPrefix(false))}\r\n";
-            }
-            return str;
-        }
-    }
-    public class ConstDeclarationNode : DeclarationNode
-    {
-        SymVarConst _var;
-        NodeExpression _value;
-        public ConstDeclarationNode(SymVarConst var, NodeExpression value)
-        {
-            this._var = var;
-            this._value = value;
-            if ((value.GetCachedType().GetType() != typeof(SymInteger)) &&
-                (value.GetCachedType().GetType() != typeof(SymReal)) &&
-                (value.GetCachedType().GetType() != typeof(SymString)))
-            {
-                throw new Exception($"Incompatible types");
-            }
-        }
-        public override string ToString(string prefix)
-        {
-            return "=" + "\r\n" + 
-                prefix + $"├─── {_var.GetName()} \r\n" +
-                prefix + $"└─── {_value.ToString(prefix + ChildrenPrefix(false))} \r\n";
-        }
-    }
-    public class TypeDeclarationNode : DeclarationNode
-    {
-        string _name;
-        SymTypeAlias _type;
-        public TypeDeclarationNode(string name, SymTypeAlias type)
-        {
-            _name = name;
-            _type = type;
-        }
-        public override string ToString(string prefix)
-        {
-            return "=" + "\r\n" +
-                prefix + $"├─── {_name.ToString()} \r\n" +
-                prefix + $"└─── {_type.ToString(prefix)} \r\n";
         }
     }
 }

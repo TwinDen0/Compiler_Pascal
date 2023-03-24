@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Git\\Compiler_Pascal\\Compiler\\Compiler.csproj": {}
+    "C:\\Git\\Compiler Pascal\\Compiler\\Compiler.csproj": {}
   },
   "projects": {
-    "C:\\Git\\Compiler_Pascal\\Compiler\\Compiler.csproj": {
+    "C:\\Git\\Compiler Pascal\\Compiler\\Compiler.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Git\\Compiler_Pascal\\Compiler\\Compiler.csproj",
+        "projectUniqueName": "C:\\Git\\Compiler Pascal\\Compiler\\Compiler.csproj",
         "projectName": "Compiler",
-        "projectPath": "C:\\Git\\Compiler_Pascal\\Compiler\\Compiler.csproj",
+        "projectPath": "C:\\Git\\Compiler Pascal\\Compiler\\Compiler.csproj",
         "packagesPath": "C:\\Users\\20kde\\.nuget\\packages\\",
-        "outputPath": "C:\\Git\\Compiler_Pascal\\Compiler\\obj\\",
+        "outputPath": "C:\\Git\\Compiler Pascal\\Compiler\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\20kde\\AppData\\Roaming\\NuGet\\NuGet.Config",

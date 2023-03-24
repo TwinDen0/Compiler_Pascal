@@ -2,18 +2,18 @@
 {
     public class SymTable
     {
-        Dictionary<string, Symbol> data;
+        Dictionary<string, Symbol> _data;
         public Dictionary<string, Symbol> GetData()
         {
-            return data;
+            return _data;
         }
         public int GetSize()
         {
-            return data.Count;
+            return _data.Count;
         }
         public void Add(string name, Symbol value)
         {
-            if (data.TryAdd(name, value))
+            if (_data.TryAdd(name, value))
             {
                 return;
             }
@@ -24,11 +24,9 @@
         }
         public Symbol Get(string name)
         {
-            Symbol value;
-            Symbol? check;
-            if (data.TryGetValue(name, out check))
+            Symbol? value;
+            if (_data.TryGetValue(name, out value))
             {
-                value = check;
                 return value;
             }
             else
@@ -38,35 +36,35 @@
         }
         public SymTable(Dictionary<string, Symbol> data)
         {
-            this.data = data;
+            _data = data;
         }
         public SymTable(SymTable original)
         {
-            data = new Dictionary<string, Symbol>(original.data);
+            _data = new Dictionary<string, Symbol>(original._data);
         }
     }
     public class SymTableStack
     {
-        List<SymTable> tables;
+        List<SymTable> _tables;
         public int GetCountTables()
         {
-            return tables.Count;
+            return _tables.Count;
         }
         public SymTable GetTable(int index)
         {
-            return tables[index];
+            return _tables[index];
         }
         public SymTable GetBackTable()
         {
-            return tables[^1];
+            return _tables[^1];
         }
         public void AddTable(SymTable table)
         {
-            tables.Add(table);
+            _tables.Add(table);
         }
         public void PopBack()
         {
-            tables.RemoveAt(tables.Count - 1);
+            _tables.RemoveAt(_tables.Count - 1);
         }
         public void Check(string name)
         {
@@ -83,18 +81,18 @@
             }
             catch
             {
-                throw new Exception($"Duplicate identifier \"{name.ToString()}\"");
+                throw new Exception($"Duplicate identifier \"{name}\"");
             }
         }
         public Symbol Get(string name)
         {
             Symbol res = new Symbol("");
-            bool decl = false;
-            for (int i = tables.Count - 1; i >= 0; i--)
+            bool found = false;
+            for (int i = _tables.Count - 1; i >= 0; i--)
             {
                 try
                 {
-                    res = tables[i].Get(name);
+                    res = _tables[i].Get(name);
                 }
                 catch
                 {
@@ -102,10 +100,10 @@
                 }
                 finally
                 {
-                    decl = true;
+                    found = true;
                 }
             }
-            if (!decl)
+            if (!found)
             {
                 throw new Exception("Variable not declared");
             }
@@ -113,7 +111,7 @@
         }
         public SymTableStack()
         {
-            tables = new List<SymTable>();
+            _tables = new List<SymTable>();
         }
     }
 }
